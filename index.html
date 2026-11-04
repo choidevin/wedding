@@ -6,12 +6,12 @@
 <meta name="robots" content="noindex, nofollow">
 <title>최성호 ♥ 김량균 결혼합니다</title>
 
-<!-- 카톡·문자로 링크를 보냈을 때 나오는 미리보기 (도메인이 정해지면 og:image, og:url 주소 수정) -->
+<!-- 카톡·문자로 링크를 보냈을 때 나오는 미리보기 -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="최성호 ♥ 김량균 결혼합니다">
 <meta property="og:description" content="2027년 3월 20일 토요일 오후 1시 30분, W스퀘어웨딩홀">
-<meta property="og:image" content="https://도메인/og.jpg">
-<meta property="og:url" content="https://도메인/">
+<meta property="og:image" content="https://wedding.vsunghov.workers.dev/img/01_01.png">
+<meta property="og:url" content="https://wedding.vsunghov.workers.dev/">
 
 <!-- 폰트: 한글 명조 + 숫자용 세리프 -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -282,13 +282,21 @@
   .sec--gallery { padding: 60px 24px; }
   .concepts { width: 100%; }
   .concept + .concept { margin-top: 14px; }
+  .gallery__title {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+    color: #6b5a50;
+    letter-spacing: .05em;
+    margin-bottom: 24px;
+  }
 
   /* 대표(가로형) 사진 */
   .concept__cover {
     position: relative;
     display: block;
     width: 100%;
-    aspect-ratio: 3 / 1;                     /* 가로 3 : 세로 1 */
+    aspect-ratio: 2 / 1;                     /* 가로 2 : 세로 1 */
     padding: 0;
     border: 0;
     border-radius: 10px;
@@ -323,7 +331,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 14px 0 10px;
+    padding: 7px 0 5px;
   }
   .nav-btn {
     width: 44px; height: 44px;               /* 누르기 쉬운 크기 */
@@ -366,7 +374,7 @@
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    padding-bottom: 6px;
+    padding-bottom: 3px;
   }
   .concept__track::-webkit-scrollbar { display: none; }
   .concept__track .photo {
@@ -533,7 +541,7 @@
     flex-direction: column;
     gap: 8px;
   }
-  .tl-photo {
+  .tl-photos .tl-photo {
     width: 100%;
     aspect-ratio: 1 / 1;
     border-radius: 12px;
@@ -947,7 +955,10 @@
       </section>
       <!-- 3단: 웨딩 컨셉 사진 4개 (사진은 script의 CONCEPTS 에서 수정) -->
       <section class="sec sec--gallery" id="sec3">
-        <div class="concepts" id="concepts"></div>
+        <div class="concepts">
+          <h2 class="gallery__title reveal">웨딩 사진첩</h2>
+          <div id="concepts"></div>
+        </div>
       </section>
       <!-- 4단: 우리의 이야기 (타임라인)
            내용과 사진은 아래 script의 STORY 에서 수정합니다 -->
@@ -990,8 +1001,7 @@
                 <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
                 네이버 지도
               </a>
-              <!-- 카카오맵: 공유 링크가 준비되면 href="#" 를 링크로 바꾸고 data-todo 를 지우세요 -->
-              <a class="route__btn" href="#" target="_blank" rel="noopener" data-todo>
+              <a class="route__btn" href="https://place.map.kakao.com/1143897257" target="_blank" rel="noopener">
                 <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
                 카카오맵
               </a>
@@ -1313,12 +1323,12 @@
           </div>
           <span class="tl-dot"></span>
           <div class="tl-photos">
-            ${it.photos.map((n) => `<div class="tl-photo">${imgTag(4, n)}</div>`).join('')}
+            ${it.photos.map((n) => `<button type="button" class="photo tl-photo">${imgTag(4, n)}</button>`).join('')}
           </div>
         </div>`).join('');
 
       panelsEl.insertAdjacentHTML('beforeend',
-        `<div class="tl-panel${i === 0 ? ' is-active' : ''}" data-year="${year}">
+        `<div class="tl-panel${i === 0 ? ' is-active' : ''}" data-year="${year}" data-lb-group>
            <div class="tl-list">${items}</div>
          </div>`);
     });
@@ -1411,7 +1421,7 @@
     renderLightbox();
   }
 
-  // 세부 사진 클릭 → 같은 컨셉 안에서 넘겨보기 (타임라인 사진은 확대 없음)
+  // 사진 클릭 → 같은 묶음(해당 컨셉 / 해당 연도 타임라인) 안에서 넘겨보기
   document.addEventListener('click', (e) => {
     const el = e.target.closest('.photo');
     if (!el || el.closest('.lightbox')) return;
@@ -1475,7 +1485,7 @@
     groom: {
       title: '신랑측 마음 전하실 곳',
       list: [
-        { bank: 'OO은행', number: '000-0000-0000-00', holder: '최성호' },
+        { bank: '토스', number: '1000-0049-8350', holder: '최성호' },
       ],
     },
     bride: {
@@ -1524,7 +1534,8 @@
   const SHARE = {
     title: '최성호 ♥ 김량균 결혼합니다',
     description: '2027년 3월 20일 토요일 오후 1시 30분\nW스퀘어웨딩홀 3층',
-    image: location.origin + '/og.jpg',   // 저장소 최상위의 og.jpg (1200×630 권장)
+    url: 'https://wedding.vsunghov.workers.dev/',
+    image: 'https://wedding.vsunghov.workers.dev/img/01_01.png',   // 카톡 카드 사진 (메인 사진)
   };
 
   if (KAKAO_JS_KEY && window.Kakao && !Kakao.isInitialized()) {
@@ -1536,7 +1547,7 @@
       showToast('카카오톡 공유는 준비 중입니다');
       return;
     }
-    const url = location.origin + location.pathname;
+    const url = SHARE.url;
     Kakao.Share.sendDefault({
       objectType: 'feed',
       content: {
@@ -1553,7 +1564,7 @@
   });
 
   document.getElementById('shareUrl').addEventListener('click', () => {
-    copyText(location.origin + location.pathname, '청첩장 주소가 복사되었습니다');
+    copyText(SHARE.url, '청첩장 주소가 복사되었습니다');
   });
 
   // 링크가 아직 없는 버튼
