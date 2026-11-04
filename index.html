@@ -2,264 +2,1578 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FAQ 관리</title>
-<style>
-  :root{
-    --page-bg:#f5f6f8; --panel-bg:#ffffff; --border:#e5e7eb;
-    --text:#111827; --sub:#6b7280; --accent:#2f6fed; --muted-bg:#f3f4f6;
-  }
-  * { box-sizing:border-box; }
-  body {
-    margin:0; background:var(--page-bg); color:var(--text);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Malgun Gothic",sans-serif;
-  }
-  .wrap { max-width:820px; margin:0 auto; padding:28px 24px 120px; }
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>최성호 ♥ 김량균 결혼합니다</title>
 
-  .page-head { margin-bottom:18px; }
-  .page-head h1 { margin:0 0 6px; font-size:21px; font-weight:800; }
-  .page-head p  { margin:0; font-size:13.5px; color:var(--sub); }
+<!-- 카톡·문자로 링크를 보냈을 때 나오는 미리보기 (도메인이 정해지면 og:image, og:url 주소 수정) -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="최성호 ♥ 김량균 결혼합니다">
+<meta property="og:description" content="2027년 3월 20일 토요일 오후 1시 30분, W스퀘어웨딩홀">
+<meta property="og:image" content="https://도메인/og.jpg">
+<meta property="og:url" content="https://도메인/">
 
-  .hint-note {
-    font-size:12.5px; color:var(--sub); background:#eef1f5; border-radius:8px;
-    padding:10px 14px; margin-bottom:18px; line-height:1.6;
-  }
+<!-- 폰트: 한글 명조 + 숫자용 세리프 -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Nanum+Myeongjo:wght@400;700&display=swap" rel="stylesheet">
 
-  /* ---- FAQ 카드 (최대 7개, 인라인 수정) ---- */
-  .item-list { display:flex; flex-direction:column; gap:12px; }
-  .item-card {
-    background:var(--panel-bg); border:1px solid var(--border); border-radius:10px;
-    padding:16px 18px; transition: opacity .15s ease;
-  }
-  .item-card.disabled { opacity:.5; }
-
-  .item-card__top { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
-
-  .switch { position:relative; width:40px; height:23px; flex:0 0 auto; }
-  .switch input { opacity:0; width:0; height:0; }
-  .switch .slider {
-    position:absolute; inset:0; background:#d1d5db; border-radius:999px; cursor:pointer; transition:.15s;
-  }
-  .switch .slider::before {
-    content:""; position:absolute; width:17px; height:17px; left:3px; top:3px;
-    background:#fff; border-radius:50%; transition:.15s; box-shadow:0 1px 3px rgba(0,0,0,.25);
-  }
-  .switch input:checked + .slider { background:var(--accent); }
-  .switch input:checked + .slider::before { transform:translateX(17px); }
-
-  .item-status { font-size:12.5px; font-weight:700; flex:0 0 auto; }
-  .item-status.on { color:#15803d; }
-  .item-status.off { color:#9aa0a8; }
-
-  .item-card__label {
-    font-size:12.5px; font-weight:700; color:var(--sub);
-    background:var(--muted-bg); padding:3px 9px; border-radius:999px; margin-left:auto;
-  }
-
-  .field-col { margin-bottom:12px; }
-  .field-col:last-child { margin-bottom:0; }
-  .field-col label { display:block; font-size:12px; color:var(--sub); margin-bottom:6px; }
-  .field-col input[type="text"], .field-col textarea {
-    width:100%; padding:10px 12px; border:1px solid #d9dce1; border-radius:6px;
-    font-size:13.5px; font-family:inherit;
-  }
-  .field-col textarea { min-height:70px; resize:vertical; line-height:1.6; }
-  .field-col input:focus, .field-col textarea:focus {
-    outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(47,111,237,.12);
-  }
-  .field-hint { font-size:11px; color:var(--sub); margin-top:4px; }
-  .char-count { font-size:11px; color:var(--sub); margin-top:4px; text-align:right; }
-  .char-count.over { color:#dc2626; font-weight:700; }
-
-  .color-field-row { display:flex; gap:16px; flex-wrap:wrap; }
-  .color-field { flex:1 1 160px; }
-  .color-field__label { display:block; font-size:12px; color:var(--sub); margin-bottom:6px; }
-  .color-row { display:flex; align-items:center; gap:8px; }
-  .color-row input[type="color"] {
-    width:36px; height:36px; flex:0 0 auto; padding:0; border:1px solid #d9dce1;
-    border-radius:6px; cursor:pointer; background:none;
-  }
-  .color-row input[type="text"] {
-    flex:1; padding:8px 10px; border:1px solid #d9dce1; border-radius:6px;
-    font-family:"SFMono-Regular",Consolas,monospace; font-size:12.5px;
-  }
-
-  /* ---- 하단 저장 바 ---- */
-  .save-bar {
-    position:sticky; bottom:20px; margin-top:20px;
-    background:#eaf1ff; border:1px solid #cddcfb; border-radius:10px;
-    padding:14px 20px; display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;
-  }
-  .saved-toast { font-size:13px; color:#15803d; opacity:0; transition:opacity .2s ease; margin-right:auto; }
-  .saved-toast.show { opacity:1; }
-  .btn-save {
-    padding:11px 26px; border:0; border-radius:8px; background:var(--accent); color:#fff;
-    font-size:14px; font-weight:700; cursor:pointer;
-  }
-  .btn-save:hover { background:#1d55d1; }
-  .save-bar .note { font-size:13px; color:#1f4fb0; }
-</style>
-</head>
-<body>
-
-<div class="wrap">
-
-  <div class="page-head">
-    <h1>FAQ 관리</h1>
-    <p>홈페이지에 노출되는 자주 묻는 질문을 최대 7개까지 직접 입력하고 관리할 수 있습니다.</p>
-  </div>
-
-  <div class="hint-note">항목은 최대 <b>7개</b>까지이며, 사용하지 않는 항목은 노출 스위치를 꺼두면 됩니다. 순서는 아래 목록 순서 그대로 프론트에 노출됩니다.</div>
-
-  <div class="item-card" style="margin-bottom:16px;">
-    <div class="field-col">
-      <label>FAQ 영역 바로가기 링크 (선택, 전체 1개)</label>
-      <input type="text" id="sectionLinkInput" placeholder="https:// (없으면 비워두세요)" value="https://ezcampus.co.kr/faq">
-      <div class="field-hint">개별 질문이 아닌 FAQ 영역 전체에 대해 하나의 링크만 사용됩니다. 마지막 질문・답변 아래에 라운드 버튼으로 노출됩니다.</div>
-    </div>
-    <div class="field-col" style="margin-top:16px; max-width:220px;">
-      <label>버튼 문구 (최대 6자)</label>
-      <input type="text" id="btnTextInput" maxlength="6" value="더보기">
-      <div class="char-count" id="btnTextCount">3/6</div>
-    </div>
-    <div class="field-col" style="margin-top:16px;">
-      <label>버튼 스타일</label>
-      <div class="color-field-row">
-        <div class="color-field">
-          <span class="color-field__label">글자색</span>
-          <div class="color-row">
-            <input type="color" id="btnTextColor" value="#2f6fed">
-            <input type="text" id="btnTextColorHex" value="#2F6FED">
-          </div>
-        </div>
-        <div class="color-field">
-          <span class="color-field__label">버튼 배경색</span>
-          <div class="color-row">
-            <input type="color" id="btnBgColor" value="#ffffff">
-            <input type="text" id="btnBgColorHex" value="#FFFFFF">
-          </div>
-        </div>
-        <div class="color-field">
-          <span class="color-field__label">버튼 테두리색</span>
-          <div class="color-row">
-            <input type="color" id="btnBorderColor" value="#2f6fed">
-            <input type="text" id="btnBorderColorHex" value="#2F6FED">
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="item-list" id="itemList"></div>
-
-  <div class="save-bar">
-    <span class="saved-toast" id="savedToast">저장되었습니다.</span>
-    <span class="note">변경 사항은 저장 버튼을 눌러야 반영됩니다.</span>
-    <button type="button" class="btn-save" id="saveBtn">저장하기</button>
-  </div>
-</div>
 
 <script>
-const $ = id => document.getElementById(id);
+  // 이미지 파일이 없으면 깨진 아이콘 대신 "파일명" 빈 박스를 보여줌
+  function imgFallback(el) {
+    const name = el.getAttribute('src').split('/').pop();
+    const ph = document.createElement('span');
+    ph.className = 'photo__ph';
+    ph.textContent = name;
+    el.replaceWith(ph);
+  }
+</script>
 
-// ---- 고정 7개 슬롯 (데모용 초기 데이터, 5개만 채워둠) ----
-let items = [
-  { id:1, question:'수강 신청은 어떻게 하나요?', answer:'로그인 후 [강의실] 메뉴에서 원하는 과정을 선택하고 [신청하기] 버튼을 누르면 바로 수강 신청이 완료됩니다.', visible:true },
-  { id:2, question:'수료증은 어디서 발급받나요?', answer:'진도율 100% 달성 시 [마이페이지 > 수료증 발급] 메뉴에서 즉시 출력 및 저장이 가능합니다.', visible:true },
-  { id:3, question:'결제 후 환불이 가능한가요?', answer:'수강 시작 전, 또는 진도율 10% 미만인 경우 전액 환불이 가능합니다. 자세한 기준은 이용약관을 참고해 주세요.', visible:true },
-  { id:4, question:'모바일에서도 수강할 수 있나요?', answer:'네, PC와 모바일 모두에서 동일한 계정으로 수강이 가능하며 진도율도 자동 동기화됩니다.', visible:true },
-  { id:5, question:'아이디/비밀번호를 잊어버렸어요.', answer:'로그인 화면의 [아이디/비밀번호 찾기]에서 본인 인증 후 재설정할 수 있습니다.', visible:true },
-  { id:6, question:'', answer:'', visible:false },
-  { id:7, question:'', answer:'', visible:false }
-];
+<style>
+  /* =========================================
+     기본 설정
+     ========================================= */
+  :root {
+    --app-width: 480px;          /* 모바일 청첩장 최대 폭 */
+    --intro-bg: #000;            /* 인트로 배경색 (이미지 없을 때) */
+    --intro-text: #fff;
+    --intro-sub: rgba(255,255,255,.6);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: #000;            /* PC에서 양옆 여백 색 */
+    color: #222;
+    font-family: 'Nanum Myeongjo', serif;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body.is-intro { overflow: hidden; }   /* 인트로 중에는 스크롤 잠금 */
 
-function findItem(id) { return items.find(it => it.id === id); }
-function escapeHtml(s) {
-  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
+  /* 모바일 규격 컨테이너 (PC에서는 가운데 480px) */
+  .app {
+    position: relative;
+    max-width: var(--app-width);
+    min-height: 100vh;
+    min-height: 100dvh;
+    margin: 0 auto;
+    background: #fff;
+    overflow: hidden;
+    overflow: clip;              /* hidden 대신 clip: 상단 고정(sticky)이 동작하도록 */
+  }
 
-// ---- 더 많은 질문 보기 버튼 색상 동기화 ----
-function syncColorPair(picker, hexInput) {
-  picker.addEventListener('input', () => { hexInput.value = picker.value.toUpperCase(); });
-  hexInput.addEventListener('input', () => {
-    let v = hexInput.value.trim();
-    if (/^#[0-9A-Fa-f]{6}$/.test(v)) picker.value = v;
+  /* =========================================
+     인트로
+     ========================================= */
+  .intro {
+    position: fixed;
+    top: 0; bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: var(--app-width);
+    height: 100vh;
+    height: 100dvh;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--intro-bg);
+    color: var(--intro-text);
+    text-align: center;
+    overflow: hidden;
+    transition: opacity 1.2s ease, visibility 1.2s ease;
+  }
+  .intro.is-hide { opacity: 0; visibility: hidden; }
+
+  /* 배경 이미지 레이어 — 우주 이미지가 준비되면 url만 넣으면 됩니다 */
+  .intro__bg {
+    position: absolute;
+    inset: 0;
+    background-color: var(--intro-bg);
+    /* 배경 이미지는 img/00_01.png (script에서 자동 연결, 파일이 없으면 검정) */
+    background-size: cover;
+    background-position: center;
+    animation: bgZoom 20s ease-out forwards;   /* 천천히 다가오는 효과 */
+  }
+  /* 글자가 잘 보이도록 살짝 어둡게 덮는 레이어 */
+  .intro__bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,.15) 0%, rgba(0,0,0,.55) 100%);
+  }
+
+  .intro__content {
+    position: relative;
+    z-index: 1;
+    padding: 0 24px;
+  }
+  .intro__date {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: 18px;
+    letter-spacing: .25em;
+    color: var(--intro-sub);
+    margin-bottom: 18px;
+  }
+  .intro__date span { margin-left: .6em; }
+  .intro__title {
+    font-family: 'Nanum Myeongjo', serif;
+    font-weight: 400;
+    font-size: 24px;
+    letter-spacing: .08em;
+    line-height: 1.6;
+    margin-bottom: 56px;
+  }
+
+  .intro__btn {
+    display: inline-block;
+    min-width: 160px;
+    padding: 14px 32px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,.7);
+    border-radius: 999px;
+    color: #fff;
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 15px;
+    letter-spacing: .15em;
+    cursor: pointer;
+    transition: background .3s, color .3s;
+    animation-name: fadeUp, glow;
+  }
+  .intro__btn:active { background: rgba(255,255,255,.9); color: #000; }
+
+  /* 순차 등장 애니메이션: 날짜 → 텍스트 → 버튼
+     처음엔 완전히 안 보이다가, 하나가 다 나타난 뒤 다음 것이 나타남 */
+  .fade-seq {
+    opacity: 0;
+    animation: fadeUp .96s ease forwards;
+  }
+  .fade-seq.d1 { animation-delay: .4s; }    /* 날짜 */
+  .fade-seq.d2 { animation-delay: 1.52s; }  /* 텍스트 */
+  .intro__btn.fade-seq {                    /* 버튼 */
+    animation: fadeUp .96s ease 2.64s forwards, glow 3s ease-in-out 3.6s infinite;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes glow {
+    0%, 100% { box-shadow: 0 0 0 rgba(255,255,255,0); }
+    50%      { box-shadow: 0 0 18px rgba(255,255,255,.35); }
+  }
+  @keyframes bgZoom {
+    from { transform: scale(1.12); }
+    to   { transform: scale(1); }
+  }
+
+  /* =========================================
+     BGM 토글 버튼
+     ========================================= */
+  .bgm-btn {
+    position: fixed;
+    top: 16px;
+    /* 480px 컨테이너 오른쪽 안쪽에 고정 */
+    right: max(16px, calc((100vw - var(--app-width)) / 2 + 16px));
+    z-index: 90;
+    width: 40px; height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255,255,255,.85);
+    box-shadow: 0 2px 8px rgba(0,0,0,.15);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .6s;
+  }
+  .bgm-btn.is-show { opacity: 1; pointer-events: auto; }
+  .bgm-btn svg { width: 20px; height: 20px; fill: #333; }
+  .bgm-btn .icon-off { display: none; }
+  .bgm-btn.is-muted .icon-on  { display: none; }
+  .bgm-btn.is-muted .icon-off { display: block; }
+  .bgm-btn.is-playing .icon-on { animation: spin 4s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* =========================================
+     본문 (다음 단계에서 채울 영역)
+     ========================================= */
+  /* 각 영역은 화면 높이에 맞추지 않고, 내용 + 위아래 여백만큼만 차지
+     → 다음 영역이 자연스럽게 함께 보임 */
+  :root {
+    --sec-space: 90px;            /* 영역 위아래 여백 (조절 가능) */
+    --sec-white: #ffffff;
+    --sec-gray: #f4f4f4;
+  }
+  .sec {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--sec-space) 24px;
+    text-align: center;
+  }
+  .sec:nth-child(odd)  { background: var(--sec-white); }
+  .sec:nth-child(even) { background: var(--sec-gray); }
+
+  .sec__label {
+    font-size: 20px;
+    color: #999;
+    letter-spacing: .1em;
+  }
+
+  /* 스크롤 시 서서히 나타나는 효과 (공통) */
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity .9s ease, transform .9s ease;
+  }
+  .reveal.is-visible { opacity: 1; transform: none; }
+
+  /* =========================================
+     2단: 인사말
+     ========================================= */
+  .greeting { width: 100%; }
+  .greeting__text {
+    font-size: clamp(13px, 3.9vw, 15px);
+    line-height: 2.1;
+    color: #666;
+    letter-spacing: -.01em;
+    word-break: keep-all;
+  }
+  .greeting__line {
+    width: 48px;
+    height: 1px;
+    margin: 44px auto;
+    background: #ccc;
+    border: 0;
+  }
+  .greeting__names {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .greeting__name {
+    font-size: 17px;
+    font-weight: 700;
+    color: #555;
+    letter-spacing: .05em;
+    margin-bottom: 10px;
+  }
+  .greeting__parents {
+    font-size: clamp(12px, 3.6vw, 14px);
+    color: #888;
+    word-break: keep-all;
+  }
+
+  /* =========================================
+     1단: 메인 사진
+     ========================================= */
+  .sec--main { padding: 0; }
+  .main-photo { width: 100%; background: #e2e2e2; }
+  .main-photo img { width: 100%; height: auto; display: block; }
+  .main-photo .photo__ph { aspect-ratio: 3 / 4; height: auto; }
+
+  /* =========================================
+     3단: 웨딩 컨셉 사진 (누르면 세부 사진이 아래로 펼쳐짐)
+     ========================================= */
+  .sec--gallery { padding: 60px 24px; }
+  .concepts { width: 100%; }
+  .concept + .concept { margin-top: 14px; }
+
+  /* 대표(가로형) 사진 */
+  .concept__cover {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 3 / 1;                     /* 가로 3 : 세로 1 */
+    padding: 0;
+    border: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #e2e2e2;
+    cursor: pointer;
+  }
+  .concept__cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .concept__more {
+    position: absolute;
+    right: 10px; bottom: 10px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: rgba(0,0,0,.55);
+    color: #fff;
+    font-size: 13px;
+    letter-spacing: .02em;
+  }
+  .concept.is-open .concept__more { display: none; }
+
+  /* 펼쳐지는 영역 (높이 0 → 내용 높이로 부드럽게) */
+  .concept__panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows .45s ease;
+  }
+  .concept.is-open .concept__panel { grid-template-rows: 1fr; }
+  .concept__inner { overflow: hidden; min-height: 0; }
+
+  /* 좌우 버튼 + 접기 */
+  .concept__bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 14px 0 10px;
+  }
+  .nav-btn {
+    width: 44px; height: 44px;               /* 누르기 쉬운 크기 */
+    border: 1px solid #d8cfc8;
+    border-radius: 50%;
+    background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: opacity .2s;
+  }
+  .nav-btn svg { width: 20px; height: 20px; stroke: #6b5a50; stroke-width: 2; fill: none; }
+  .nav-btn:disabled { opacity: .3; cursor: default; }
+  .concept__count {
+    margin-left: 4px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    color: #888;
+    letter-spacing: .1em;
+  }
+  .fold-btn {
+    margin-left: auto;
+    height: 40px;
+    padding: 0 16px;
+    border: 1px solid #d8cfc8;
+    border-radius: 999px;
+    background: #fff;
+    color: #6b5a50;
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* 세부 사진 가로 줄 (버튼 또는 손가락으로 넘김) */
+  .concept__track {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 6px;
+  }
+  .concept__track::-webkit-scrollbar { display: none; }
+  .concept__track .photo {
+    flex: 0 0 82%;                           /* 다음 사진이 살짝 보이게 */
+    scroll-snap-align: start;
+    border-radius: 10px;
+    background: #fff;                        /* 가로 사진일 때 위아래 여백 색 */
+  }
+  /* 사진을 자르지 않고 틀 안에 전체를 맞춤
+     (가로 사진은 가로 기준으로 맞추고 위아래는 흰 여백) */
+  .concept__track .photo img { object-fit: contain; }
+  .concept__track .photo .photo__ph { background: #e2e2e2; }
+
+  .photo {
+    display: block;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    border: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #e2e2e2;
+    cursor: zoom-in;
+    padding: 0;
+  }
+  .photo img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  /* 사진이 없을 때 임시 표시 */
+  .photo__ph {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: #888;
+    font-family: 'Nanum Myeongjo', serif;
+  }
+
+  /* =========================================
+     4단: 우리의 이야기 (타임라인)
+     ========================================= */
+  :root {
+    --accent: #a08474;            /* 타임라인 포인트 색 */
+    --story-title: #6b5a50;
+  }
+  .story { width: 100%; }
+
+  /* 제목 + 연도 탭: 4단을 스크롤하는 동안 상단에 고정 */
+  .story__head {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    margin: 0 -24px 32px;
+    padding: 16px 24px 14px;
+    background: var(--sec-gray);
+    transition: opacity .35s ease, transform .35s ease;
+  }
+  .story__head.is-stuck { box-shadow: 0 6px 12px -10px rgba(0,0,0,.25); }
+  /* 5단이 절반 이상 보이면 사라짐 */
+  .story__head.is-hidden {
+    opacity: 0;
+    transform: translateY(-12px);
+    pointer-events: none;
+  }
+  .story__title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--story-title);
+    letter-spacing: .05em;
+    margin-bottom: 12px;
+  }
+  .story__sub {
+    font-size: 13px;
+    color: #999;
+    margin-bottom: 20px;
+  }
+
+  /* 연도 탭 */
+  .tabs {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+  }
+  .tab {
+    min-width: 84px;
+    padding: 8px 20px;
+    border: 1px solid #d8cfc8;
+    border-radius: 999px;
+    background: #fff;
+    color: #9a8b82;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    letter-spacing: .1em;
+    cursor: pointer;
+    transition: background .3s, color .3s, border-color .3s;
+  }
+  .tab.is-active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .tl-panel { display: none; }
+  .tl-panel.is-active { display: block; animation: panelIn .5s ease; }
+  @keyframes panelIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  /* 중앙 라인 기준 좌우 교차 배치 */
+  .tl-list { position: relative; }
+  .tl-list::before {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0; left: 50%;
+    width: 1px;
+    background: #d9d0ca;
+    transform: translateX(-50%);
+  }
+  .tl-item {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 32px 1fr;
+    align-items: start;
+    margin-bottom: 48px;
+  }
+  .tl-item:last-child { margin-bottom: 0; }
+  .tl-text, .tl-dot, .tl-photos { grid-row: 1; }
+
+  /* 기본: 글 왼쪽 / 사진 오른쪽 */
+  .tl-text   { grid-column: 1; text-align: right; }
+  .tl-dot    { grid-column: 2; }
+  .tl-photos { grid-column: 3; }
+  /* 반대: 사진 왼쪽 / 글 오른쪽 */
+  .tl-item--rev .tl-text   { grid-column: 3; text-align: left; }
+  .tl-item--rev .tl-photos { grid-column: 1; }
+
+  .tl-dot {
+    justify-self: center;
+    width: 11px; height: 11px;
+    margin-top: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px var(--sec-gray);   /* 라인 위에 떠 보이도록 */
+    position: relative;
+    z-index: 1;
+  }
+  .tl-title {
+    font-size: clamp(13px, 3.7vw, 15px);
+    font-weight: 700;
+    color: var(--story-title);
+    line-height: 1.5;
+    margin-bottom: 10px;
+    word-break: keep-all;
+  }
+  .tl-desc {
+    font-size: clamp(12px, 3.4vw, 13.5px);
+    color: #888;
+    line-height: 1.9;
+    word-break: keep-all;
+  }
+
+  /* 사진: 2장 이상이면 세로로 쌓임 */
+  .tl-photos {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .tl-photo {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #e2e2e2;
+  }
+  .tl-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .tl-photo .photo__ph { font-size: 13px; }
+
+  /* =========================================
+     5단: 장소 / 오시는 길
+     ========================================= */
+  .place { width: 100%; text-align: left; }
+  .place__heading {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--story-title);
+    letter-spacing: .05em;
+    margin-bottom: 18px;
+  }
+  .place__name {
+    font-size: 17px;
+    font-weight: 700;
+    color: #555;
+    margin-bottom: 8px;
+  }
+  .place__addr {
+    font-size: clamp(13px, 3.8vw, 14.5px);
+    color: #777;
+    line-height: 1.8;
+    word-break: keep-all;
+  }
+  /* 주소 끝 복사 아이콘 */
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px; height: 26px;
+    margin-left: 4px;
+    vertical-align: middle;
+    border: 0;
+    border-radius: 6px;
+    background: none;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  .copy-btn:active { background: #eee; }
+  .copy-btn svg { width: 16px; height: 16px; stroke: #999; fill: none; stroke-width: 1.8; }
+
+  .place__map {
+    margin-top: 28px;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #e2e2e2;
+  }
+  .place__map img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .place__map .photo__ph { height: 100%; }
+
+  /* 길찾기 버튼 */
+  .route {
+    margin-top: 14px;
+  }
+  .route__label {
+    font-size: 13px;
+    color: #999;
+    margin-bottom: 8px;
+  }
+  .route__btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .route__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 46px;
+    border: 1px solid #e3dcd7;
+    border-radius: 10px;
+    background: #faf8f6;
+    color: #6b5a50;
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .route__btn:active { background: #f0ebe7; }
+  .route__btn svg { width: 16px; height: 16px; fill: var(--accent); }
+
+  /* 오시는 길 */
+  .way { margin-top: 48px; }
+  .way__row {
+    display: grid;
+    grid-template-columns: 76px 1fr;
+    gap: 12px;
+    padding: 16px 0;
+    border-top: 1px solid #eee;
+  }
+  .way__row:last-child { border-bottom: 1px solid #eee; }
+  .way__key {
+    font-size: 14px;
+    font-weight: 700;
+    color: #6b5a50;
+    line-height: 1.8;
+  }
+  .way__val {
+    font-size: clamp(13px, 3.7vw, 14px);
+    color: #777;
+    line-height: 1.8;
+    word-break: keep-all;
+  }
+  .way__val p + p { margin-top: 4px; }
+  .way__val > * + * { margin-top: 8px; }
+  .way__list { list-style: none; }
+  .way__list li {
+    position: relative;
+    padding-left: 12px;
+  }
+  .way__list li + li { margin-top: 4px; }
+  .way__list li::before {
+    content: "";
+    position: absolute;
+    left: 0; top: .8em;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .way__em { color: #666; font-weight: 700; }
+  .way__note {
+    font-size: .92em;
+    color: #999;
+  }
+
+  /* =========================================
+     6단: 마음 전하기
+     ========================================= */
+  .gift { width: 100%; }
+  .gift__title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--story-title);
+    letter-spacing: .05em;
+    margin-bottom: 28px;
+  }
+  .gift__cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .gift__who {
+    font-size: clamp(13px, 3.8vw, 15px);
+    color: #888;
+    margin-bottom: 12px;
+  }
+  .gift__who b { color: #555; font-weight: 700; }
+  .gift__btn {
+    width: 100%;
+    max-width: 170px;
+    height: 48px;
+    border: 1px solid #e3dcd7;
+    border-radius: 10px;
+    background: #faf8f6;
+    color: #6b5a50;
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: clamp(13px, 3.8vw, 15px);
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .gift__btn:active { background: #f0ebe7; }
+
+  /* 계좌 안내 작은 창 (모달) */
+  .modal {
+    position: fixed; inset: 0;
+    z-index: 250;
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+    background: rgba(0,0,0,.45);
+    opacity: 0; visibility: hidden;
+    transition: opacity .3s, visibility .3s;
+  }
+  .modal.is-open { opacity: 1; visibility: visible; }
+  .modal__box {
+    position: relative;
+    width: 100%;
+    max-width: 340px;
+    padding: 28px 22px 22px;
+    border-radius: 16px;
+    background: #fff;
+    transform: translateY(16px);
+    transition: transform .3s ease;
+  }
+  .modal.is-open .modal__box { transform: none; }
+  .modal__close {
+    position: absolute;
+    top: 10px; right: 12px;
+    border: 0; background: none;
+    font-size: 26px; line-height: 1;
+    color: #aaa;
+    cursor: pointer;
+    padding: 4px;
+  }
+  .modal__title {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--story-title);
+    margin-bottom: 20px;
+  }
+  .acc {
+    padding: 16px;
+    border-radius: 10px;
+    background: #f8f6f4;
+  }
+  .acc + .acc { margin-top: 10px; }
+  .acc__row {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .acc__row + .acc__row { margin-top: 6px; }
+  .acc__key { color: #999; font-size: 13px; }
+  .acc__val { color: #444; word-break: break-all; }
+  .acc__num { font-weight: 700; letter-spacing: .02em; }
+
+  /* =========================================
+     7단: 청첩장 공유하기
+     ========================================= */
+  .share { width: 100%; }
+  .share__title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--story-title);
+    letter-spacing: .05em;
+    margin-bottom: 32px;
+  }
+  .share__btns {
+    display: flex;
+    justify-content: center;
+    gap: 56px;
+  }
+  .share__btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 14px;
+    color: #555;
+  }
+  .share__icon {
+    width: 56px; height: 56px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform .2s;
+  }
+  .share__btn:active .share__icon { transform: scale(.92); }
+  .share__icon--kakao { background: #fee500; }
+  .share__icon--kakao svg { width: 26px; height: 26px; fill: #3a1d1d; }
+  .share__icon--url { background: #eef0f4; }
+  .share__icon--url svg { width: 22px; height: 22px; fill: #444; }
+
+  /* 복사 완료 안내 (토스트) */
+  .toast {
+    position: fixed;
+    left: 50%; bottom: 40px;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(0,0,0,.78);
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 20px;
+    font-size: 13px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity .3s, transform .3s;
+    pointer-events: none;
+    z-index: 300;
+  }
+  .toast.is-show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* =========================================
+     사진 확대 (라이트박스)
+     ========================================= */
+  .lightbox {
+    position: fixed; inset: 0;
+    z-index: 200;
+    background: rgba(0,0,0,.92);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; visibility: hidden;
+    transition: opacity .35s, visibility .35s;
+  }
+  .lightbox.is-open { opacity: 1; visibility: visible; }
+
+  .lb-stage {
+    width: 100%;
+    max-width: var(--app-width);
+    padding: 0 16px;
+    transform: scale(.94);
+    transition: transform .35s ease;
+  }
+  .lightbox.is-open .lb-stage { transform: scale(1); }
+  .lb-stage img {
+    width: 100%;
+    max-height: 80vh;
+    max-height: 80svh;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+  }
+  .lb-stage .photo__ph {
+    aspect-ratio: 3 / 4;
+    height: auto;
+    max-height: 80svh;
+    margin: 0 auto;
+    background: #333;
+    color: #aaa;
+    border-radius: 6px;
+    font-size: 22px;
+  }
+
+  .lb-btn {
+    position: absolute;
+    border: 0;
+    background: none;
+    color: #fff;
+    cursor: pointer;
+    line-height: 1;
+    padding: 12px;
+    opacity: .8;
+  }
+  .lb-close { top: 12px; right: 12px; font-size: 32px; }
+  .lb-prev, .lb-next { top: 50%; transform: translateY(-50%); font-size: 36px; }
+  .lb-prev { left: 4px; }
+  .lb-next { right: 4px; }
+  .lb-count {
+    position: absolute;
+    bottom: 24px; left: 0; right: 0;
+    text-align: center;
+    color: rgba(255,255,255,.7);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    letter-spacing: .15em;
+  }
+  body.is-lock { overflow: hidden; }
+</style>
+</head>
+
+<body class="is-intro">
+
+  <!-- ===== 인트로 ===== -->
+  <section class="intro" id="intro">
+    <div class="intro__bg"></div>
+    <div class="intro__content">
+      <p class="intro__date fade-seq d1">2027. 03. 20<span>1:30</span></p>
+      <h1 class="intro__title fade-seq d2">그녀를 데리러 갑니다.</h1>
+      <button type="button" class="intro__btn fade-seq d3" id="introBtn">함께 가요</button>
+    </div>
+  </section>
+
+  <!-- ===== BGM ===== -->
+  <!-- 곡 목록은 아래 script의 BGM_LIST에서 관리 -->
+  <audio id="bgm" preload="auto"></audio>
+  <button type="button" class="bgm-btn" id="bgmBtn" aria-label="배경음악 끄기/켜기">
+    <!-- 재생 중 아이콘 -->
+    <svg class="icon-on" viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>
+    <!-- 음소거 아이콘 -->
+    <svg class="icon-off" viewBox="0 0 24 24"><path d="M4.27 3 3 4.27l9 9v.28A4 4 0 1 0 14 17v-1.73L19.73 21 21 19.73 4.27 3zM14 7h4V3h-6v5.18l2 2V7z"/></svg>
+  </button>
+
+  <!-- ===== 본문 ===== -->
+  <div class="app">
+    <main class="main" id="main">
+      <!-- 1단: 메인 사진 (img/01_01.png) -->
+      <section class="sec sec--main" id="sec1">
+        <div class="main-photo">
+          <img src="img/01_01.png" alt="" onerror="imgFallback(this)">
+        </div>
+      </section>
+      <!-- 2단: 인사말 -->
+      <section class="sec" id="sec2">
+        <div class="greeting">
+          <p class="greeting__text reveal">
+            우연히 시작된 우리의 인연이<br>
+            같은 곳을 바라보는 사랑이 되었습니다.<br>
+            이제 평생을 함께 걸어갈 저희 두 사람의 시작을<br>
+            따뜻한 마음으로 축복해 주시면 감사하겠습니다.
+          </p>
+
+          <hr class="greeting__line reveal">
+
+          <div class="greeting__names reveal">
+            <div>
+              <p class="greeting__name">최성호</p>
+              <p class="greeting__parents">손진연의 장남</p>
+            </div>
+            <div>
+              <p class="greeting__name">김량균</p>
+              <p class="greeting__parents">김창수 · 구희라의 차녀</p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- 3단: 웨딩 컨셉 사진 4개 (사진은 script의 CONCEPTS 에서 수정) -->
+      <section class="sec sec--gallery" id="sec3">
+        <div class="concepts" id="concepts"></div>
+      </section>
+      <!-- 4단: 우리의 이야기 (타임라인)
+           내용과 사진은 아래 script의 STORY 에서 수정합니다 -->
+      <section class="sec" id="sec4">
+        <div class="story" id="story">
+          <div class="story__head" id="storyHead">
+            <h2 class="story__title reveal">우리의 이야기</h2>
+            <p class="story__sub reveal">우리가 만나, 함께 걸어온 시간들.</p>
+            <div class="tabs reveal" id="storyTabs"></div>
+          </div>
+          <div id="storyPanels"></div>
+        </div>
+      </section>
+      <!-- 5단: 장소 / 오시는 길 -->
+      <section class="sec" id="sec5">
+        <div class="place">
+          <h2 class="place__heading reveal">장소</h2>
+
+          <div class="reveal">
+            <p class="place__name">W스퀘어웨딩홀</p>
+            <p class="place__addr">
+              부산광역시 부산진구 신천대로 252<br>
+              일성인포아파트 주상복합상가 3층<button type="button" class="copy-btn"
+                data-copy="부산광역시 부산진구 신천대로 252 일성인포아파트 주상복합상가 3층"
+                data-msg="주소가 복사되었습니다" aria-label="주소 복사하기">
+                <svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>
+              </button>
+            </p>
+          </div>
+
+          <!-- 지도 이미지 (img/05_01.png) -->
+          <div class="place__map reveal">
+            <img src="img/05_01.png" alt="W스퀘어웨딩홀 약도" onerror="imgFallback(this)">
+          </div>
+
+          <div class="route reveal">
+            <p class="route__label">길찾기</p>
+            <div class="route__btns">
+              <a class="route__btn" href="https://naver.me/5bVsWS2O" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
+                네이버 지도
+              </a>
+              <!-- 카카오맵: 공유 링크가 준비되면 href="#" 를 링크로 바꾸고 data-todo 를 지우세요 -->
+              <a class="route__btn" href="#" target="_blank" rel="noopener" data-todo>
+                <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5z"/></svg>
+                카카오맵
+              </a>
+            </div>
+          </div>
+
+          <div class="way">
+            <h2 class="place__heading reveal">오시는 길</h2>
+            <div class="reveal">
+              <div class="way__row">
+                <p class="way__key">지하철</p>
+                <div class="way__val">
+                  <p>2호선 부암역 4번 출구<br>도보 약 10분</p>
+                </div>
+              </div>
+              <div class="way__row">
+                <p class="way__key">버스</p>
+                <div class="way__val">
+                  <ul class="way__list">
+                    <li>부암초등학교 하차 · 도보 약 1분</li>
+                    <li>부산진구청 정문 하차 · 도보 약 3분</li>
+                    <li>마을버스 15번 이용 시 메리움아파트 또는 일성아파트 하차 · 도보 약 1분</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="way__row">
+                <p class="way__key">셔틀버스</p>
+                <div class="way__val">
+                  <p><b class="way__em">탑승 장소</b><br>서면역 9번 출구 영광도서 맞은편 마을버스 정류장</p>
+                  <ul class="way__list">
+                    <li><b class="way__em">예식장행</b> : 매시 10분 · 30분 · 50분</li>
+                    <li><b class="way__em">서면역행</b> : 매시 정각 · 20분 · 40분</li>
+                    <li><b class="way__em">운행 간격</b> : 20분 (시간당 3회)</li>
+                  </ul>
+                  <p class="way__note">※ 서면역행 셔틀은 웨딩홀 정문에서 탑승하실 수 있습니다.</p>
+                </div>
+              </div>
+              <div class="way__row">
+                <p class="way__key">내비게이션</p>
+                <div class="way__val">
+                  <p>'일성인포아파트상가' 또는<br>'더파티 서면점' 검색</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- 6단: 마음 전하기 (계좌 정보는 script의 ACCOUNTS 에서 수정) -->
+      <section class="sec" id="sec6">
+        <div class="gift">
+          <h2 class="gift__title reveal">마음 전하기</h2>
+          <div class="gift__cols reveal">
+            <div>
+              <p class="gift__who">신랑 <b>최성호</b> 측</p>
+              <button type="button" class="gift__btn" data-account="groom">마음 전하실 곳</button>
+            </div>
+            <div>
+              <p class="gift__who">신부 <b>김량균</b> 측</p>
+              <button type="button" class="gift__btn" data-account="bride">마음 전하실 곳</button>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- 7단: 청첩장 공유하기 -->
+      <section class="sec" id="sec7">
+        <div class="share">
+          <h2 class="share__title reveal">청첩장 공유하기</h2>
+          <div class="share__btns reveal">
+            <button type="button" class="share__btn" id="shareKakao">
+              <span class="share__icon share__icon--kakao">
+                <svg viewBox="0 0 24 24"><path d="M12 3C6.48 3 2 6.58 2 11c0 2.83 1.84 5.31 4.6 6.73l-.93 3.4a.4.4 0 0 0 .6.44l4.03-2.66c.56.06 1.12.09 1.7.09 5.52 0 10-3.58 10-8S17.52 3 12 3z"/></svg>
+              </span>
+              카카오톡
+            </button>
+            <button type="button" class="share__btn" id="shareUrl">
+              <span class="share__icon share__icon--url">
+                <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11A2.99 2.99 0 0 0 21 5a3 3 0 1 0-5.91.7L8.04 9.81A3 3 0 1 0 6 15a2.99 2.99 0 0 0 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65A2.92 2.92 0 1 0 18 16.08z"/></svg>
+              </span>
+              URL 복사
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- 계좌 안내 작은 창 -->
+  <div class="modal" id="accModal" aria-hidden="true">
+    <div class="modal__box" role="dialog" aria-modal="true" aria-labelledby="accTitle">
+      <button type="button" class="modal__close" id="accClose" aria-label="닫기">&times;</button>
+      <p class="modal__title" id="accTitle"></p>
+      <div id="accList"></div>
+    </div>
+  </div>
+
+  <!-- 복사 완료 안내 -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ===== 사진 확대 (라이트박스) ===== -->
+  <div class="lightbox" id="lightbox" aria-hidden="true">
+    <button type="button" class="lb-btn lb-close" id="lbClose" aria-label="닫기">&times;</button>
+    <button type="button" class="lb-btn lb-prev" id="lbPrev" aria-label="이전 사진">&#8249;</button>
+    <div class="lb-stage" id="lbStage"></div>
+    <button type="button" class="lb-btn lb-next" id="lbNext" aria-label="다음 사진">&#8250;</button>
+    <p class="lb-count" id="lbCount"></p>
+  </div>
+
+<!-- 카카오톡 공유 SDK (버전은 카카오 개발자 문서에서 최신 확인) -->
+<script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js"></script>
+<script>
+  const intro   = document.getElementById('intro');
+  const introBtn = document.getElementById('introBtn');
+  const bgm     = document.getElementById('bgm');
+  const bgmBtn  = document.getElementById('bgmBtn');
+
+  // ===== BGM 목록: 1 → 2 → 3 → 1 … 순서대로 반복 재생 =====
+  const BGM_LIST = [
+    'bgm/bgm1.mp3',
+    'bgm/bgm2.mp3',
+    'bgm/bgm3.mp3',
+  ];
+  let bgmIndex = 0;
+  bgm.src = BGM_LIST[bgmIndex];
+
+  // 한 곡이 끝나면 다음 곡으로
+  bgm.addEventListener('ended', () => {
+    bgmIndex = (bgmIndex + 1) % BGM_LIST.length;
+    bgm.src = BGM_LIST[bgmIndex];
+    playBgm();
   });
-}
-syncColorPair($('btnTextColor'), $('btnTextColorHex'));
-syncColorPair($('btnBgColor'), $('btnBgColorHex'));
-syncColorPair($('btnBorderColor'), $('btnBorderColorHex'));
 
-// ---- 버튼 문구 글자수 카운트 (최대 6자 = 7자 미만) ----
-function updateBtnTextCount() {
-  const len = $('btnTextInput').value.length;
-  const el = $('btnTextCount');
-  el.textContent = `${len}/6`;
-  el.classList.toggle('over', len > 6);
-}
-$('btnTextInput').addEventListener('input', updateBtnTextCount);
-updateBtnTextCount();
+  // 음악 재생 (브라우저가 막아도 에러 없이 넘어가도록)
+  function playBgm() {
+    const p = bgm.play();
+    if (p && p.catch) {
+      p.then(() => setBgmState(true))
+       .catch(() => setBgmState(false));
+    }
+  }
 
-function renderList() {
-  const list = $('itemList');
-  list.innerHTML = '';
+  function setBgmState(isPlaying) {
+    bgmBtn.classList.toggle('is-playing', isPlaying);
+    bgmBtn.classList.toggle('is-muted', !isPlaying);
+  }
 
-  items.forEach((item, i) => {
-    const card = document.createElement('div');
-    card.className = 'item-card' + (item.visible ? '' : ' disabled');
-    card.innerHTML = `
-      <div class="item-card__top">
-        <label class="switch">
-          <input type="checkbox" class="visible-toggle" data-id="${item.id}" ${item.visible ? 'checked' : ''}>
-          <span class="slider"></span>
-        </label>
-        <span class="item-status ${item.visible ? 'on' : 'off'}">${item.visible ? '노출' : '미노출'}</span>
-        <span class="item-card__label">FAQ ${i + 1}</span>
-      </div>
+  // 인트로 버튼: 사용자 터치 순간에 음악 재생 → 인트로 사라짐
+  introBtn.addEventListener('click', () => {
+    playBgm();
+    window.scrollTo(0, 0);           // 본문은 항상 1단부터 시작
+    intro.classList.add('is-hide');
+    document.body.classList.remove('is-intro');
+    bgmBtn.classList.add('is-show');
 
-      <div class="field-col">
-        <label>질문 (Q)</label>
-        <input type="text" class="question-input" data-id="${item.id}" placeholder="질문을 입력하세요" value="${escapeHtml(item.question)}">
-      </div>
-      <div class="field-col">
-        <label>답변 (A)</label>
-        <textarea class="answer-input" data-id="${item.id}" placeholder="답변을 입력하세요">${escapeHtml(item.answer)}</textarea>
-      </div>
-    `;
-    list.appendChild(card);
+    // 페이드아웃이 끝나면 인트로 제거
+    setTimeout(() => intro.remove(), 1300);
   });
 
-  bindEvents();
-}
+  // 음악 on/off 토글
+  bgmBtn.addEventListener('click', () => {
+    if (bgm.paused) {
+      playBgm();
+    } else {
+      bgm.pause();
+      setBgmState(false);
+    }
+  });
 
-function bindEvents() {
-  document.querySelectorAll('.visible-toggle').forEach(el => {
-    el.addEventListener('change', () => {
-      findItem(Number(el.dataset.id)).visible = el.checked;
-      renderList();
+  // ===== 이미지 경로 규칙 =====
+  // img 폴더 안의  섹션번호_이미지번호.확장자  (예: img/04_01.png)
+  const IMG_DIR = 'img/';
+  const IMG_EXT = 'png';      // jpg 로 저장했다면 'jpg' 로 변경
+  const pad2 = (n) => String(n).padStart(2, '0');
+  function imgPath(sec, n) {
+    return `${IMG_DIR}${pad2(sec)}_${pad2(n)}.${IMG_EXT}`;
+  }
+  function imgTag(sec, n) {
+    return `<img src="${imgPath(sec, n)}" alt="" loading="lazy" onerror="imgFallback(this)">`;
+  }
+
+  // 인트로 배경 이미지: img/00_01.png
+  document.querySelector('.intro__bg').style.backgroundImage = `url('${imgPath(0, 1)}')`;
+
+  // ===== 4단: 우리의 이야기 =====
+  // photos: 이 항목에 쓸 사진 번호 (4단 사진이므로 img/04_번호.png)
+  //   예) photos: [1, 2]  →  img/04_01.png, img/04_02.png
+  // text: 줄바꿈은 \n
+  const STORY = {
+    '2025': [
+      { title: '2025.06.01 · 우리의 첫 만남', text: '우연히 시작된 인연,\n우리의 이야기가 시작된 날.', photos: [1, 2] },
+      { title: '첫 데이트 · 연극', text: '함께 본 첫 번째 연극,\n그리고 조금 더 가까워진 우리.', photos: [3] },
+      { title: '설레는 기다림 · 퇴근길', text: '그녀를 기다리는 시간마저\n하루의 가장 즐거운 순간이 되었습니다.', photos: [4] },
+      { title: '소소한 일상 · 카페', text: '커피 한 잔과 끝없는 이야기,\n평범한 하루도 특별해졌습니다.', photos: [5, 6] },
+      { title: '첫 번째 생일', text: '함께 축하한 첫 생일,\n소중한 추억이 하나 더 쌓였습니다.', photos: [7] },
+      { title: '우리의 제주 여행', text: '함께 떠난 제주에서\n잊지 못할 순간들을 담았습니다.', photos: [8, 9, 10] },
+      { title: 'Happy Christmas', text: '함께 맞이한 첫 크리스마스,\n서로가 있어 더 따뜻했던 겨울.', photos: [11] },
+    ],
+    '2026': [
+      { title: '2026 · 묵호 여행', text: '새해의 첫 여행,\n우리의 추억은 또 한 페이지 늘어났습니다.', photos: [12] },
+      { title: '여전히 소소한 일상', text: '특별한 일이 없어도 좋은,\n함께여서 행복한 평범한 날들.', photos: [13, 14] },
+      { title: '두 번째 생일', text: '두 번째로 함께하는 생일,\n앞으로의 생일도 함께하기로.', photos: [15] },
+      { title: '우리의 여행 이야기', text: '함께 걸었던 낯선 길마다\n우리만의 이야기가 쌓였습니다.', photos: [16, 17] },
+      { title: '또 다른 시작 · Wedding', text: '수많은 순간이 모여\n이제 평생을 함께할 약속이 되었습니다.', photos: [18] },
+    ],
+  };
+
+  // ===== 3단: 웨딩 컨셉 사진 =====
+  // 3단 사진이므로 img/03_번호.png
+  // cover: 가로형 대표 사진 번호 / details: 펼쳤을 때 나오는 세부 사진 번호 (개수 자유)
+  const CONCEPTS = [
+    { cover: 1, details: [5, 6, 7, 8, 9, 10] },
+    { cover: 2, details: [11, 12, 13, 14, 15, 16] },
+    { cover: 3, details: [17, 18, 19, 20, 21, 22] },
+    { cover: 4, details: [23, 24, 25, 26, 27, 28] },
+  ];
+
+  (function renderConcepts() {
+    const wrap = document.getElementById('concepts');
+    const ARROW_L = '<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>';
+    const ARROW_R = '<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>';
+
+    wrap.innerHTML = CONCEPTS.map((c, i) => `
+      <div class="concept reveal">
+        <button type="button" class="concept__cover" aria-expanded="false">
+          ${imgTag(3, c.cover)}
+          <span class="concept__more">사진 더보기 +</span>
+        </button>
+        <div class="concept__panel">
+          <div class="concept__inner">
+            <div class="concept__bar">
+              <button type="button" class="nav-btn" data-dir="-1" aria-label="이전 사진">${ARROW_L}</button>
+              <button type="button" class="nav-btn" data-dir="1" aria-label="다음 사진">${ARROW_R}</button>
+              <span class="concept__count">1 / ${c.details.length}</span>
+              <button type="button" class="fold-btn">접기</button>
+            </div>
+            <div class="concept__track" data-lb-group>
+              ${c.details.map((n) => `<button type="button" class="photo">${imgTag(3, n)}</button>`).join('')}
+            </div>
+          </div>
+        </div>
+      </div>`).join('');
+
+    const items = Array.from(wrap.querySelectorAll('.concept'));
+
+    // 현재 몇 번째 사진인지 계산해서 번호·버튼 상태 갱신
+    function updateNav(item) {
+      const track = item.querySelector('.concept__track');
+      const photosEl = track.querySelectorAll('.photo');
+      const step = photosEl[0].offsetWidth + 8;
+      const idx = Math.round(track.scrollLeft / step);
+      const atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
+      const shown = atEnd ? photosEl.length : Math.min(idx + 1, photosEl.length);
+      item.querySelector('.concept__count').textContent = `${shown} / ${photosEl.length}`;
+      item.querySelector('[data-dir="-1"]').disabled = track.scrollLeft <= 4;
+      item.querySelector('[data-dir="1"]').disabled = atEnd;
+    }
+
+    function setOpen(item, open) {
+      item.classList.toggle('is-open', open);
+      item.querySelector('.concept__cover').setAttribute('aria-expanded', open);
+      if (open) {
+        const track = item.querySelector('.concept__track');
+        track.style.scrollBehavior = 'auto';
+        track.scrollLeft = 0;
+        track.style.scrollBehavior = '';
+        updateNav(item);
+      }
+    }
+
+    items.forEach((item) => {
+      const track = item.querySelector('.concept__track');
+
+      // 대표 사진 누르면 펼치기 / 다시 누르면 접기 (한 번에 하나만 열림)
+      item.querySelector('.concept__cover').addEventListener('click', () => {
+        const willOpen = !item.classList.contains('is-open');
+        items.forEach((other) => { if (other !== item) setOpen(other, false); });
+        setOpen(item, willOpen);
+        if (willOpen) {
+          // 위쪽 컨셉이 접히면서 위치가 바뀌므로, 누른 사진이 보이도록 맞춤
+          setTimeout(() => {
+            const top = item.getBoundingClientRect().top + window.scrollY - 16;
+            window.scrollTo({ top, behavior: 'smooth' });
+          }, 460);
+        }
+      });
+
+      // 접기
+      item.querySelector('.fold-btn').addEventListener('click', () => setOpen(item, false));
+
+      // 좌우 버튼: 한 장씩 이동
+      item.querySelectorAll('.nav-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const step = track.querySelector('.photo').offsetWidth + 8;
+          track.scrollBy({ left: step * Number(btn.dataset.dir), behavior: 'smooth' });
+        });
+      });
+
+      // 손가락으로 넘겨도 번호·버튼 상태 갱신
+      let t;
+      track.addEventListener('scroll', () => {
+        clearTimeout(t);
+        t = setTimeout(() => updateNav(item), 80);
+      }, { passive: true });
+    });
+  })();
+
+  (function renderStory() {
+    const tabsEl   = document.getElementById('storyTabs');
+    const panelsEl = document.getElementById('storyPanels');
+
+    Object.keys(STORY).forEach((year, i) => {
+      tabsEl.insertAdjacentHTML('beforeend',
+        `<button type="button" class="tab${i === 0 ? ' is-active' : ''}" data-year="${year}">${year}</button>`);
+
+      const items = STORY[year].map((it, idx) => `
+        <div class="tl-item${idx % 2 ? ' tl-item--rev' : ''} reveal">
+          <div class="tl-text">
+            <p class="tl-title">${it.title}</p>
+            <p class="tl-desc">${it.text.replace(/\n/g, '<br>')}</p>
+          </div>
+          <span class="tl-dot"></span>
+          <div class="tl-photos">
+            ${it.photos.map((n) => `<div class="tl-photo">${imgTag(4, n)}</div>`).join('')}
+          </div>
+        </div>`).join('');
+
+      panelsEl.insertAdjacentHTML('beforeend',
+        `<div class="tl-panel${i === 0 ? ' is-active' : ''}" data-year="${year}">
+           <div class="tl-list">${items}</div>
+         </div>`);
+    });
+
+    // 탭 전환
+    tabsEl.addEventListener('click', (e) => {
+      const tab = e.target.closest('.tab');
+      if (!tab) return;
+      const year = tab.dataset.year;
+      tabsEl.querySelectorAll('.tab').forEach((t) => t.classList.toggle('is-active', t === tab));
+      panelsEl.querySelectorAll('.tl-panel').forEach((p) => p.classList.toggle('is-active', p.dataset.year === year));
+
+      // 다른 연도를 고르면 4단 맨 위(첫 항목이 보이는 위치)로 이동
+      const story = document.getElementById('story');
+      const top = story.getBoundingClientRect().top + window.scrollY - 16;
+      if (window.scrollY > top) window.scrollTo({ top, behavior: 'smooth' });
+    });
+  })();
+
+  // ===== 4단 상단 고정 헤더: 고정 상태 표시 / 5단이 절반 이상 보이면 숨김 =====
+  (function stickyStoryHead() {
+    const head = document.getElementById('storyHead');
+    const next = document.getElementById('sec5');
+    let ticking = false;
+
+    function update() {
+      ticking = false;
+      const vh = window.innerHeight;
+      // 고정된 상태인지 (그림자 표시용)
+      head.classList.toggle('is-stuck', head.getBoundingClientRect().top <= 0.5);
+
+      // 5단이 화면에 보이는 높이가 (5단 높이와 화면 높이 중 작은 값)의 절반 이상이면 숨김
+      const r = next.getBoundingClientRect();
+      const visible = Math.max(0, Math.min(r.bottom, vh) - Math.max(r.top, 0));
+      const half = Math.min(r.height, vh) / 2;
+      head.classList.toggle('is-hidden', visible >= half);
+    }
+    window.addEventListener('scroll', () => {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  })();
+
+  // 스크롤 시 .reveal 요소가 화면에 들어오면 서서히 나타남
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+        revealObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.2 });
+  document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el));
+
+  // ===== 사진 확대 (라이트박스) =====
+  const lightbox = document.getElementById('lightbox');
+  const lbStage  = document.getElementById('lbStage');
+  const lbCount  = document.getElementById('lbCount');
+  let photos  = [];        // 현재 확대 화면에서 넘겨볼 사진 묶음
+  let lbIndex = 0;
+
+  function renderLightbox() {
+    const src = photos[lbIndex];
+    const img = src.querySelector('img');
+    // 원본 고화질이 따로 있으면 data-full 사용
+    lbStage.innerHTML = img
+      ? `<img src="${img.dataset.full || img.src}" alt="">`
+      : `<div class="photo__ph">${src.textContent.trim()}</div>`;
+    lbCount.textContent = `${lbIndex + 1} / ${photos.length}`;
+  }
+
+  function openLightbox(list, index) {
+    photos = list;
+    lbIndex = index;
+    renderLightbox();
+    lightbox.classList.add('is-open');
+    lightbox.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('is-lock');
+  }
+
+  function closeLightbox() {
+    lightbox.classList.remove('is-open');
+    lightbox.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('is-lock');
+  }
+
+  function moveLightbox(step) {
+    lbIndex = (lbIndex + step + photos.length) % photos.length;
+    renderLightbox();
+  }
+
+  // 세부 사진 클릭 → 같은 컨셉 안에서 넘겨보기 (타임라인 사진은 확대 없음)
+  document.addEventListener('click', (e) => {
+    const el = e.target.closest('.photo');
+    if (!el || el.closest('.lightbox')) return;
+    const group = el.closest('[data-lb-group]');
+    const list = Array.from(group.querySelectorAll('.photo'));
+    openLightbox(list, list.indexOf(el));
+  });
+  document.getElementById('lbClose').addEventListener('click', closeLightbox);
+  document.getElementById('lbPrev').addEventListener('click', () => moveLightbox(-1));
+  document.getElementById('lbNext').addEventListener('click', () => moveLightbox(1));
+  // 검은 배경을 누르면 닫기
+  lightbox.addEventListener('click', (e) => {
+    if (e.target === lightbox) closeLightbox();
+  });
+  // 확대 화면에서 좌우로 밀어서 넘기기
+  let touchX = 0;
+  lightbox.addEventListener('touchstart', (e) => { touchX = e.touches[0].clientX; }, { passive: true });
+  lightbox.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 50) moveLightbox(dx < 0 ? 1 : -1);
+  });
+
+  // ===== 복사 기능 (주소, 이후 계좌번호·전화번호에도 공통 사용) =====
+  const toastEl = document.getElementById('toast');
+  let toastTimer;
+  function showToast(msg) {
+    toastEl.textContent = msg;
+    toastEl.classList.add('is-show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('is-show'), 1800);
+  }
+
+  async function copyText(text, msg = '복사되었습니다') {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      // 카카오톡 인앱 브라우저 등에서 위 방식이 막힐 때를 위한 대체 방법
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+    }
+    showToast(msg);
+  }
+
+  // data-copy 가 붙은 버튼을 누르면 그 값을 복사
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-copy]');
+    if (!btn) return;
+    copyText(btn.dataset.copy, btn.dataset.msg);
+  });
+
+  // ===== 6단: 마음 전하기 =====
+  // 계좌는 여러 개 넣을 수 있습니다 (예: 혼주 계좌 추가 시 list 에 한 줄 더)
+  const ACCOUNTS = {
+    groom: {
+      title: '신랑측 마음 전하실 곳',
+      list: [
+        { bank: 'OO은행', number: '000-0000-0000-00', holder: '최성호' },
+      ],
+    },
+    bride: {
+      title: '신부측 마음 전하실 곳',
+      list: [
+        { bank: 'OO은행', number: '000-0000-0000-00', holder: '김량균' },
+      ],
+    },
+  };
+
+  const accModal = document.getElementById('accModal');
+  const COPY_ICON = '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>';
+
+  function openAccount(key) {
+    const data = ACCOUNTS[key];
+    document.getElementById('accTitle').textContent = data.title;
+    document.getElementById('accList').innerHTML = data.list.map((a) => `
+      <div class="acc">
+        <div class="acc__row"><span class="acc__key">은행명</span><span class="acc__val">${a.bank}</span></div>
+        <div class="acc__row"><span class="acc__key">계좌번호</span>
+          <span class="acc__val"><span class="acc__num">${a.number}</span><button type="button" class="copy-btn"
+            data-copy="${a.number.replace(/[^0-9]/g, '')}" data-msg="계좌번호가 복사되었습니다" aria-label="계좌번호 복사하기">${COPY_ICON}</button></span>
+        </div>
+        <div class="acc__row"><span class="acc__key">예금주</span><span class="acc__val">${a.holder}</span></div>
+      </div>`).join('');
+    accModal.classList.add('is-open');
+    accModal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('is-lock');
+  }
+
+  function closeAccount() {
+    accModal.classList.remove('is-open');
+    accModal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('is-lock');
+  }
+
+  document.querySelectorAll('[data-account]').forEach((btn) => {
+    btn.addEventListener('click', () => openAccount(btn.dataset.account));
+  });
+  document.getElementById('accClose').addEventListener('click', closeAccount);
+  accModal.addEventListener('click', (e) => { if (e.target === accModal) closeAccount(); });
+
+  // ===== 7단: 청첩장 공유하기 =====
+  // 카카오 개발자 콘솔의 JavaScript 키를 넣으면 카카오톡 공유가 동작합니다
+  const KAKAO_JS_KEY = '';
+  const SHARE = {
+    title: '최성호 ♥ 김량균 결혼합니다',
+    description: '2027년 3월 20일 토요일 오후 1시 30분\nW스퀘어웨딩홀 3층',
+    image: location.origin + '/og.jpg',   // 저장소 최상위의 og.jpg (1200×630 권장)
+  };
+
+  if (KAKAO_JS_KEY && window.Kakao && !Kakao.isInitialized()) {
+    Kakao.init(KAKAO_JS_KEY);
+  }
+
+  document.getElementById('shareKakao').addEventListener('click', () => {
+    if (!KAKAO_JS_KEY || !window.Kakao || !Kakao.isInitialized()) {
+      showToast('카카오톡 공유는 준비 중입니다');
+      return;
+    }
+    const url = location.origin + location.pathname;
+    Kakao.Share.sendDefault({
+      objectType: 'feed',
+      content: {
+        title: SHARE.title,
+        description: SHARE.description,
+        imageUrl: SHARE.image,
+        link: { mobileWebUrl: url, webUrl: url },
+      },
+      buttons: [{
+        title: '청첩장 보기',
+        link: { mobileWebUrl: url, webUrl: url },
+      }],
     });
   });
-  document.querySelectorAll('.question-input').forEach(el => {
-    el.addEventListener('input', () => { findItem(Number(el.dataset.id)).question = el.value; });
+
+  document.getElementById('shareUrl').addEventListener('click', () => {
+    copyText(location.origin + location.pathname, '청첩장 주소가 복사되었습니다');
   });
-  document.querySelectorAll('.answer-input').forEach(el => {
-    el.addEventListener('input', () => { findItem(Number(el.dataset.id)).answer = el.value; });
+
+  // 링크가 아직 없는 버튼
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest('[data-todo]');
+    if (!a) return;
+    e.preventDefault();
+    showToast('준비 중입니다');
   });
-}
 
-$('saveBtn').addEventListener('click', () => {
-  const invalid = items.find(it => it.visible && (!it.question.trim() || !it.answer.trim()));
-  if (invalid) { alert('노출 처리된 항목은 질문과 답변을 모두 입력해 주세요.'); return; }
-  if ($('btnTextInput').value.trim().length === 0) { alert('버튼 문구를 입력해 주세요.'); return; }
-  if ($('btnTextInput').value.length > 6) { alert('버튼 문구는 6자(7자 미만) 이내로 입력해 주세요.'); return; }
-
-  // TODO: 실제 연동 시 이 시점에 items 배열 + 버튼 문구/링크/색상 값을 서버로 저장하세요.
-  const toast = $('savedToast');
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 1500);
-});
-
-renderList();
+  // 다른 앱으로 갔다 오면 음악 일시정지 (카톡 인앱 등)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && !bgm.paused) {
+      bgm.pause();
+      bgm.dataset.resume = '1';
+    } else if (!document.hidden && bgm.dataset.resume === '1') {
+      bgm.dataset.resume = '';
+      playBgm();
+    }
+  });
 </script>
 </body>
 </html>
