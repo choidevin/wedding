@@ -407,12 +407,106 @@
   .concept.is-open .concept__panel { grid-template-rows: 1fr; }
   .concept__inner { overflow: hidden; min-height: 0; }
 
-  /* 좌우 버튼 + 접기 */
-  .concept__bar {
+  /* ===== 앨범 (책장 넘기기) ===== */
+  .album { padding: 10px 0 4px; }
+
+  /* 앨범 겉표지(가죽) + 오른쪽에 겹쳐 보이는 종이 두께 */
+  .album__book {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    padding: 10px 14px 10px 18px;
+    border-radius: 6px 10px 10px 6px;
+    background:
+      linear-gradient(90deg, rgba(0,0,0,.35) 0, rgba(0,0,0,0) 10px),
+      linear-gradient(135deg, #8a6f5e, #6e5546);
+    box-shadow: 0 10px 22px -8px rgba(60,40,30,.45);
+  }
+  /* 종이 묶음 (넘어간 페이지 아래에 깔린 페이지들) */
+  .album__stack {
+    position: absolute;
+    top: 10px; bottom: 10px; left: 18px; right: 14px;
+    border-radius: 2px 4px 4px 2px;
+    background: #f3eee7;
+    box-shadow:
+      1px 0 0 #e4dcd1, 2px 0 0 #f3eee7,
+      3px 0 0 #e4dcd1, 4px 0 0 #f3eee7,
+      5px 0 0 #ddd3c6;
+  }
+  /* 책장이 넘어가는 무대 (왼쪽 제본선을 축으로 회전) */
+  .album__stage {
+    position: absolute;
+    top: 10px; bottom: 10px; left: 18px; right: 14px;
+    perspective: 1600px;
+    overflow: hidden;                 /* 넘어간 페이지는 책 밖으로 사라짐 */
+    touch-action: pan-y;              /* 세로 스크롤은 그대로, 가로 밀기는 넘기기 */
+  }
+  .leaf {
+    position: absolute;
+    inset: 0;
+    transform-origin: left center;
+    transform: rotateY(0deg);
+    transition: transform .75s cubic-bezier(.45,.05,.3,1);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    background: #fbf8f3;
+    border-radius: 2px 4px 4px 2px;
+    padding: 12px;
+    will-change: transform;
+  }
+  .leaf.is-flipped { transform: rotateY(-180deg); }
+  .leaf.no-anim { transition: none; }
+  /* 제본선 그림자 + 넘어갈 때 어두워지는 음영 */
+  .leaf::before {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0; left: 0;
+    width: 22px;
+    background: linear-gradient(90deg, rgba(0,0,0,.14), rgba(0,0,0,0));
+    pointer-events: none;
+    z-index: 2;
+  }
+  .leaf::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(0,0,0,.25), rgba(0,0,0,0) 60%);
+    opacity: 0;
+    transition: opacity .75s ease;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .leaf.is-flipped::after { opacity: 1; }
+
+  /* 페이지 안의 사진: 자르지 않고 전체 표시, 남는 부분은 종이색 여백 */
+  .leaf .photo {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    border-radius: 2px;
+    background: transparent;
+    position: relative;
+    z-index: 1;
+  }
+  .leaf .photo img { object-fit: contain; }
+  .leaf .photo .photo__ph { background: #e8e2da; border-radius: 2px; }
+  .leaf__no {
+    position: absolute;
+    right: 14px; bottom: 6px;
+    z-index: 3;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 12px;
+    color: #b3a79c;
+    letter-spacing: .1em;
+  }
+
+  /* 넘기기 버튼: 처음 · 이전 · 번호 · 다음 · 끝 */
+  .album__nav {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 8px;
-    padding: 7px 0 5px;
+    padding-top: 12px;
   }
   .nav-btn {
     width: 44px; height: 44px;               /* 누르기 쉬운 크기 */
@@ -422,52 +516,32 @@
     display: flex; align-items: center; justify-content: center;
     cursor: pointer;
     transition: opacity .2s;
+    padding: 0;
   }
-  .nav-btn svg { width: 20px; height: 20px; stroke: #6b5a50; stroke-width: 2; fill: none; }
+  .nav-btn svg { width: 20px; height: 20px; stroke: #6b5a50; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
   .nav-btn:disabled { opacity: .3; cursor: default; }
-  .concept__count {
-    margin-left: 4px;
+  .album__count {
+    min-width: 58px;
+    text-align: center;
     font-family: 'Cormorant Garamond', serif;
-    font-size: 16px;
+    font-size: 17px;
     color: #888;
     letter-spacing: .1em;
   }
   .fold-btn {
-    margin-left: auto;
-    height: 40px;
-    padding: 0 16px;
+    display: block;
+    margin: 10px auto 0;
+    height: 36px;
+    padding: 0 18px;
     border: 1px solid #d8cfc8;
     border-radius: 999px;
     background: #fff;
     color: #6b5a50;
     font-family: 'Nanum Myeongjo', serif;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
     cursor: pointer;
   }
-
-  /* 세부 사진 가로 줄 (버튼 또는 손가락으로 넘김) */
-  .concept__track {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    padding-bottom: 3px;
-  }
-  .concept__track::-webkit-scrollbar { display: none; }
-  .concept__track .photo {
-    flex: 0 0 82%;                           /* 다음 사진이 살짝 보이게 */
-    scroll-snap-align: start;
-    border-radius: 10px;
-    background: #fff;                        /* 가로 사진일 때 위아래 여백 색 */
-  }
-  /* 사진을 자르지 않고 틀 안에 전체를 맞춤
-     (가로 사진은 가로 기준으로 맞추고 위아래는 흰 여백) */
-  .concept__track .photo img { object-fit: contain; }
-  .concept__track .photo .photo__ph { background: #e2e2e2; }
 
   .photo {
     display: block;
@@ -1345,10 +1419,14 @@
 
   (function renderConcepts() {
     const wrap = document.getElementById('concepts');
-    const ARROW_L = '<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>';
-    const ARROW_R = '<svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>';
+    const I = {
+      first: '<svg viewBox="0 0 24 24"><path d="M17 6l-6 6 6 6"/><path d="M7 6v12"/></svg>',
+      prev:  '<svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>',
+      next:  '<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>',
+      last:  '<svg viewBox="0 0 24 24"><path d="M7 6l6 6-6 6"/><path d="M17 6v12"/></svg>',
+    };
 
-    wrap.innerHTML = CONCEPTS.map((c, i) => `
+    wrap.innerHTML = CONCEPTS.map((c) => `
       <div class="concept reveal">
         <button type="button" class="concept__cover" aria-expanded="false">
           ${imgTag(3, c.cover)}
@@ -1356,14 +1434,25 @@
         </button>
         <div class="concept__panel">
           <div class="concept__inner">
-            <div class="concept__bar">
-              <button type="button" class="nav-btn" data-dir="-1" aria-label="이전 사진">${ARROW_L}</button>
-              <button type="button" class="nav-btn" data-dir="1" aria-label="다음 사진">${ARROW_R}</button>
-              <span class="concept__count">1 / ${c.details.length}</span>
-              <button type="button" class="fold-btn">접기</button>
-            </div>
-            <div class="concept__track" data-lb-group>
-              ${c.details.map((n) => `<button type="button" class="photo">${imgTag(3, n)}</button>`).join('')}
+            <div class="album">
+              <div class="album__book">
+                <div class="album__stack"></div>
+                <div class="album__stage" data-lb-group>
+                  ${c.details.map((n, k) => `
+                    <div class="leaf" style="z-index:${c.details.length - k}">
+                      <button type="button" class="photo">${imgTag(3, n)}</button>
+                      <span class="leaf__no">${k + 1}</span>
+                    </div>`).join('')}
+                </div>
+              </div>
+              <div class="album__nav">
+                <button type="button" class="nav-btn" data-go="first" aria-label="처음 사진">${I.first}</button>
+                <button type="button" class="nav-btn" data-go="prev"  aria-label="이전 사진">${I.prev}</button>
+                <span class="album__count">1 / ${c.details.length}</span>
+                <button type="button" class="nav-btn" data-go="next"  aria-label="다음 사진">${I.next}</button>
+                <button type="button" class="nav-btn" data-go="last"  aria-label="마지막 사진">${I.last}</button>
+              </div>
+              <button type="button" class="fold-btn">접기 ▲</button>
             </div>
           </div>
         </div>
@@ -1371,65 +1460,91 @@
 
     const items = Array.from(wrap.querySelectorAll('.concept'));
 
-    // 현재 몇 번째 사진인지 계산해서 번호·버튼 상태 갱신
-    function updateNav(item) {
-      const track = item.querySelector('.concept__track');
-      const photosEl = track.querySelectorAll('.photo');
-      const step = photosEl[0].offsetWidth + 8;
-      const idx = Math.round(track.scrollLeft / step);
-      const atEnd = track.scrollLeft + track.clientWidth >= track.scrollWidth - 4;
-      const shown = atEnd ? photosEl.length : Math.min(idx + 1, photosEl.length);
-      item.querySelector('.concept__count').textContent = `${shown} / ${photosEl.length}`;
-      item.querySelector('[data-dir="-1"]').disabled = track.scrollLeft <= 4;
-      item.querySelector('[data-dir="1"]').disabled = atEnd;
-    }
+    items.forEach((item) => {
+      const leaves = Array.from(item.querySelectorAll('.leaf'));
+      const total  = leaves.length;
+      const stage  = item.querySelector('.album__stage');
+      let page = 0;                 // 지금 보이는 페이지 (0부터)
+
+      function render() {
+        item.querySelector('.album__count').textContent = `${page + 1} / ${total}`;
+        item.querySelector('[data-go="first"]').disabled = page === 0;
+        item.querySelector('[data-go="prev"]').disabled  = page === 0;
+        item.querySelector('[data-go="next"]').disabled  = page === total - 1;
+        item.querySelector('[data-go="last"]').disabled  = page === total - 1;
+      }
+
+      // target 페이지로 이동 (여러 장이면 한 장씩 차례로 넘어감)
+      function goTo(target) {
+        target = Math.max(0, Math.min(total - 1, target));
+        if (target === page) return;
+        const forward = target > page;
+        const steps = Math.abs(target - page);
+        for (let k = 0; k < steps; k++) {
+          const idx = forward ? page + k : page - 1 - k;
+          setTimeout(() => leaves[idx].classList.toggle('is-flipped', forward), k * 90);
+        }
+        page = target;
+        render();
+      }
+
+      function reset() {
+        leaves.forEach((l) => { l.classList.add('no-anim'); l.classList.remove('is-flipped'); });
+        void stage.offsetWidth;
+        leaves.forEach((l) => l.classList.remove('no-anim'));
+        page = 0;
+        render();
+      }
+      item._reset = reset;
+
+      item.querySelectorAll('[data-go]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const go = btn.dataset.go;
+          goTo(go === 'first' ? 0 : go === 'last' ? total - 1 : page + (go === 'next' ? 1 : -1));
+        });
+      });
+
+      // 손가락으로 좌우로 밀어서 넘기기 (짧게 누르면 사진 확대)
+      let sx = 0, sy = 0, swiped = false;
+      stage.addEventListener('touchstart', (e) => {
+        sx = e.touches[0].clientX; sy = e.touches[0].clientY; swiped = false;
+      }, { passive: true });
+      stage.addEventListener('touchend', (e) => {
+        const dx = e.changedTouches[0].clientX - sx;
+        const dy = e.changedTouches[0].clientY - sy;
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+          swiped = true;
+          goTo(page + (dx < 0 ? 1 : -1));
+        }
+      });
+      // 밀어서 넘긴 경우에는 사진 확대가 열리지 않도록
+      stage.addEventListener('click', (e) => {
+        if (swiped) { e.stopPropagation(); e.preventDefault(); swiped = false; }
+      }, true);
+
+      render();
+    });
 
     function setOpen(item, open) {
       item.classList.toggle('is-open', open);
       item.querySelector('.concept__cover').setAttribute('aria-expanded', open);
-      if (open) {
-        const track = item.querySelector('.concept__track');
-        track.style.scrollBehavior = 'auto';
-        track.scrollLeft = 0;
-        track.style.scrollBehavior = '';
-        updateNav(item);
-      }
+      if (open) item._reset();
     }
 
     items.forEach((item) => {
-      const track = item.querySelector('.concept__track');
-
       // 대표 사진 누르면 펼치기 / 다시 누르면 접기 (한 번에 하나만 열림)
       item.querySelector('.concept__cover').addEventListener('click', () => {
         const willOpen = !item.classList.contains('is-open');
         items.forEach((other) => { if (other !== item) setOpen(other, false); });
         setOpen(item, willOpen);
         if (willOpen) {
-          // 위쪽 컨셉이 접히면서 위치가 바뀌므로, 누른 사진이 보이도록 맞춤
           setTimeout(() => {
             const top = item.getBoundingClientRect().top + window.scrollY - 16;
             window.scrollTo({ top, behavior: 'smooth' });
           }, 460);
         }
       });
-
-      // 접기
       item.querySelector('.fold-btn').addEventListener('click', () => setOpen(item, false));
-
-      // 좌우 버튼: 한 장씩 이동
-      item.querySelectorAll('.nav-btn').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const step = track.querySelector('.photo').offsetWidth + 8;
-          track.scrollBy({ left: step * Number(btn.dataset.dir), behavior: 'smooth' });
-        });
-      });
-
-      // 손가락으로 넘겨도 번호·버튼 상태 갱신
-      let t;
-      track.addEventListener('scroll', () => {
-        clearTimeout(t);
-        t = setTimeout(() => updateNav(item), 80);
-      }, { passive: true });
     });
   })();
 
