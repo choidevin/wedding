@@ -906,13 +906,13 @@
     <div class="intro__content">
       <p class="intro__date fade-seq d1">2027. 03. 20<span>1:30</span></p>
       <h1 class="intro__title fade-seq d2">그녀를 데리러 갑니다.</h1>
-      <button type="button" class="intro__btn fade-seq d3" id="introBtn">함께 가요</button>
+      <button type="button" class="intro__btn fade-seq d3" id="introBtn">청첩장 열기(터치)</button>
     </div>
   </section>
 
   <!-- ===== BGM ===== -->
   <!-- 곡 목록은 아래 script의 BGM_LIST에서 관리 -->
-  <audio id="bgm" preload="auto"></audio>
+  <audio id="bgm" preload="metadata"></audio>
   <button type="button" class="bgm-btn" id="bgmBtn" aria-label="배경음악 끄기/켜기">
     <!-- 재생 중 아이콘 -->
     <svg class="icon-on" viewBox="0 0 24 24"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>
@@ -1119,9 +1119,8 @@
 
   // ===== BGM 목록: 1 → 2 → 3 → 1 … 순서대로 반복 재생 =====
   const BGM_LIST = [
-    'bgm/bgm1.mp3',
-    'bgm/bgm2.mp3',
-    'bgm/bgm3.mp3',
+    'bgm/01.mp3',
+    'bgm/02.mp3',
   ];
   let bgmIndex = 0;
   bgm.src = BGM_LIST[bgmIndex];
@@ -1384,6 +1383,30 @@
   }, { threshold: 0.2 });
   document.querySelectorAll('.reveal').forEach((el) => revealObserver.observe(el));
 
+  // ===== 뒤로가기 버튼으로 팝업(사진 확대, 계좌 창) 닫기 =====
+  // 팝업을 열 때 방문 기록을 하나 쌓아두고, 뒤로가기를 누르면 페이지 이동 대신 팝업만 닫힘
+  let popupHide = null;
+
+  function popupOpened(hideFn) {
+    popupHide = hideFn;
+    history.pushState({ popup: true }, '');
+  }
+
+  // × 버튼, 바깥 영역 터치로 닫을 때
+  function popupClose() {
+    if (history.state && history.state.popup) {
+      history.back();             // 쌓아둔 기록을 지우면서 아래 popstate에서 닫힘
+    } else if (popupHide) {
+      const hide = popupHide; popupHide = null; hide();
+    }
+  }
+
+  window.addEventListener('popstate', () => {
+    if (popupHide) {
+      const hide = popupHide; popupHide = null; hide();
+    }
+  });
+
   // ===== 사진 확대 (라이트박스) =====
   const lightbox = document.getElementById('lightbox');
   const lbStage  = document.getElementById('lbStage');
@@ -1408,9 +1431,10 @@
     lightbox.classList.add('is-open');
     lightbox.setAttribute('aria-hidden', 'false');
     document.body.classList.add('is-lock');
+    popupOpened(hideLightbox);
   }
 
-  function closeLightbox() {
+  function hideLightbox() {
     lightbox.classList.remove('is-open');
     lightbox.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('is-lock');
@@ -1429,12 +1453,12 @@
     const list = Array.from(group.querySelectorAll('.photo'));
     openLightbox(list, list.indexOf(el));
   });
-  document.getElementById('lbClose').addEventListener('click', closeLightbox);
+  document.getElementById('lbClose').addEventListener('click', popupClose);
   document.getElementById('lbPrev').addEventListener('click', () => moveLightbox(-1));
   document.getElementById('lbNext').addEventListener('click', () => moveLightbox(1));
   // 검은 배경을 누르면 닫기
   lightbox.addEventListener('click', (e) => {
-    if (e.target === lightbox) closeLightbox();
+    if (e.target === lightbox) popupClose();
   });
   // 확대 화면에서 좌우로 밀어서 넘기기
   let touchX = 0;
@@ -1514,9 +1538,10 @@
     accModal.classList.add('is-open');
     accModal.setAttribute('aria-hidden', 'false');
     document.body.classList.add('is-lock');
+    popupOpened(hideAccount);
   }
 
-  function closeAccount() {
+  function hideAccount() {
     accModal.classList.remove('is-open');
     accModal.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('is-lock');
@@ -1525,8 +1550,8 @@
   document.querySelectorAll('[data-account]').forEach((btn) => {
     btn.addEventListener('click', () => openAccount(btn.dataset.account));
   });
-  document.getElementById('accClose').addEventListener('click', closeAccount);
-  accModal.addEventListener('click', (e) => { if (e.target === accModal) closeAccount(); });
+  document.getElementById('accClose').addEventListener('click', popupClose);
+  accModal.addEventListener('click', (e) => { if (e.target === accModal) popupClose(); });
 
   // ===== 7단: 청첩장 공유하기 =====
   // 카카오 개발자 콘솔의 JavaScript 키를 넣으면 카카오톡 공유가 동작합니다
