@@ -9,7 +9,7 @@
 <!-- 카톡·문자로 링크를 보냈을 때 나오는 미리보기 -->
 <meta property="og:type" content="website">
 <meta property="og:title" content="최성호 ♥ 김량균 결혼합니다">
-<meta property="og:description" content="2027년 3월 20일 토요일 오후 1시 30분, W스퀘어웨딩홀">
+<meta property="og:description" content="2027년 3월 20일 토요일 오후 1시, W스퀘어웨딩홀">
 <meta property="og:image" content="https://wedding.vsunghov.workers.dev/img/01_01.png">
 <meta property="og:url" content="https://wedding.vsunghov.workers.dev/">
 
@@ -105,11 +105,30 @@
     background: radial-gradient(ellipse at center, rgba(0,0,0,.15) 0%, rgba(0,0,0,.55) 100%);
   }
 
+  /* 두 번째 배경 (img/04_10.png): 버튼이 나올 때 페이드인 */
+  .intro__bg--2 {
+    opacity: 0;
+    transition: opacity 1.2s ease;
+  }
+  .intro__bg--2::after { display: none; }      /* 밝은 사진이라 어둡게 덮지 않음 */
+  .intro.is-light .intro__bg--2 { opacity: 1; }
+  .intro.is-light .intro__bg--1 { opacity: 0; transition: opacity 1.2s ease; }
+
   .intro__content {
     position: relative;
     z-index: 1;
     padding: 0 24px;
   }
+  /* 밝은 배경으로 바뀌면 글자·버튼을 검정으로 (색도 부드럽게 전환) */
+  .intro__date, .intro__title, .intro__btn {
+    transition: color 1.2s ease, border-color 1.2s ease, background .3s;
+  }
+  .intro.is-light .intro__date  { color: rgba(0,0,0,.65); }
+  .intro.is-light .intro__title { color: #111; }
+  .intro.is-light .intro__btn   { color: #111; border-color: rgba(0,0,0,.6); }
+  .intro.is-light .intro__btn:active { background: rgba(0,0,0,.85); color: #fff; }
+  .intro__btn { --glow: rgba(255,255,255,.35); }
+  .intro.is-light .intro__btn { --glow: rgba(0,0,0,.2); }
   .intro__date {
     font-family: 'Cormorant Garamond', serif;
     font-weight: 300;
@@ -243,8 +262,8 @@
     to   { opacity: 1; transform: translateY(0); }
   }
   @keyframes glow {
-    0%, 100% { box-shadow: 0 0 0 rgba(255,255,255,0); }
-    50%      { box-shadow: 0 0 18px rgba(255,255,255,.35); }
+    0%, 100% { box-shadow: 0 0 0 transparent; }
+    50%      { box-shadow: 0 0 18px var(--glow); }
   }
   @keyframes bgZoom {
     from { transform: scale(1.12); }
@@ -1096,9 +1115,10 @@
 
   <!-- ===== 인트로 ===== -->
   <section class="intro" id="intro">
-    <div class="intro__bg"></div>
+    <div class="intro__bg intro__bg--1"></div>
+    <div class="intro__bg intro__bg--2"></div>
     <div class="intro__content">
-      <p class="intro__date fade-seq d1">2027. 03. 20<span>1:30</span></p>
+      <p class="intro__date fade-seq d1">2027. 03. 20<span>1:00</span></p>
       <h1 class="intro__title fade-seq d2">그녀를 데리러 갑니다.</h1>
       <button type="button" class="intro__btn fade-seq d3" id="introBtn" aria-label="청첩장 열기">
         <span class="tap" aria-hidden="true">
@@ -1440,7 +1460,22 @@
   }
 
   // 인트로 배경 이미지: img/00_01.png
-  document.querySelector('.intro__bg').style.backgroundImage = `url('${imgPath(0, 1)}')`;
+  document.querySelector('.intro__bg--1').style.backgroundImage = `url('${imgPath(0, 1)}')`;
+
+  // 버튼이 나타나는 순간(2.64초) 두 번째 배경(img/04_10.png)으로 페이드 전환 + 글자 검정
+  (function introSecondBg() {
+    const src = imgPath(4, 10);
+    const pre = new Image();
+    pre.src = src;                                   // 미리 받아두기
+    document.querySelector('.intro__bg--2').style.backgroundImage = `url('${src}')`;
+    const introEl = document.getElementById('intro');
+    setTimeout(() => {
+      // 사진 파일이 없으면 전환하지 않고 첫 배경 유지
+      if (pre.complete && pre.naturalWidth === 0) return;
+      const go = () => introEl && introEl.classList.add('is-light');
+      if (pre.complete) go(); else pre.onload = go;
+    }, 2640);
+  })();
 
   // ===== 4단: 우리의 이야기 =====
   // photos: 이 항목에 쓸 사진 번호 (4단 사진이므로 img/04_번호.png)
@@ -1913,7 +1948,7 @@
   const KAKAO_JS_KEY = '';
   const SHARE = {
     title: '최성호 ♥ 김량균 결혼합니다',
-    description: '2027년 3월 20일 토요일 오후 1시 30분\nW스퀘어웨딩홀 3층',
+    description: '2027년 3월 20일 토요일 오후 1시\nW스퀘어웨딩홀 3층',
     url: 'https://wedding.vsunghov.workers.dev/',
     image: 'https://wedding.vsunghov.workers.dev/img/01_01.png',   // 카톡 카드 사진 (메인 사진)
   };
