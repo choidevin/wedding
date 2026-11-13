@@ -996,6 +996,122 @@
   .acc__num { font-weight: 700; letter-spacing: .02em; }
 
   /* =========================================
+     참석 여부 · 방명록 (입력 버튼 영역)
+     ========================================= */
+  .ask { width: 100%; }
+  .ask__title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--story-title);
+    letter-spacing: .05em;
+    margin-bottom: 18px;
+  }
+  .ask__text {
+    font-size: clamp(13px, 3.8vw, 14.5px);
+    line-height: 1.9;
+    color: #777;
+    word-break: keep-all;
+    margin-bottom: 26px;
+  }
+  .ask__btn {
+    width: 100%;
+    max-width: 260px;
+    height: 50px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--accent);
+    color: #fff;
+    font-family: 'Nanum Myeongjo', serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: .03em;
+    cursor: pointer;
+  }
+  .ask__btn:active { opacity: .85; }
+
+  /* 입력 창 */
+  .modal__box--form {
+    max-width: 360px;
+    max-height: calc(100svh - 48px);
+    overflow-y: auto;
+    text-align: left;
+  }
+  .f-row + .f-row { margin-top: 16px; }
+  .f-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    color: #6b5a50;
+    margin-bottom: 8px;
+  }
+  .f-label small { font-weight: 400; color: #aaa; margin-left: 4px; }
+  .f-input {
+    width: 100%;
+    height: 46px;
+    padding: 0 12px;
+    border: 1px solid #e3dcd7;
+    border-radius: 10px;
+    background: #fff;
+    font-size: 16px;                 /* 16px 이상이어야 아이폰에서 화면이 확대되지 않음 */
+    color: #333;
+    font-family: inherit;
+  }
+  .f-input:focus { outline: none; border-color: var(--accent); }
+  .f-count { text-align: right; font-size: 12px; color: #aaa; margin-top: 4px; }
+  /* 둘 중/셋 중 하나 고르기 버튼 */
+  .f-choice { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 8px; }
+  .f-choice input { position: absolute; opacity: 0; pointer-events: none; }
+  .f-choice label {
+    height: 44px;
+    border: 1px solid #e3dcd7;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    color: #777;
+    cursor: pointer;
+    transition: background .2s, color .2s, border-color .2s;
+  }
+  .f-choice input:checked + label {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 700;
+  }
+  .f-row.is-off { display: none; }
+  .f-error { min-height: 20px; margin-top: 14px; font-size: 13px; color: #c0533f; text-align: center; }
+  .f-submit {
+    width: 100%;
+    height: 50px;
+    margin-top: 6px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .f-submit:disabled { opacity: .55; cursor: default; }
+  /* 저장 완료 화면 */
+  .f-done {
+    display: none;
+    padding: 30px 0 16px;
+    text-align: center;
+  }
+  .f-done__icon {
+    width: 56px; height: 56px;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .f-done__icon svg { width: 28px; height: 28px; stroke: #fff; stroke-width: 2.5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .f-done p { font-size: 16px; font-weight: 700; color: #555; }
+  .modal.is-done .f-form { display: none; }
+  .modal.is-done .f-done { display: block; }
+
+  /* =========================================
      7단: 청첩장 공유하기
      ========================================= */
   .share { width: 100%; }
@@ -1289,6 +1405,19 @@
           </div>
         </div>
       </section>
+      <!-- 참석 여부 전달 -->
+      <section class="sec" id="secRsvp">
+        <div class="ask">
+          <h2 class="ask__title reveal">참석 의사 전달</h2>
+          <p class="ask__text reveal">
+            축하의 마음으로 참석해 주시는 분들을<br>
+            정성껏 맞이할 수 있도록<br>
+            참석 여부를 알려주시면 감사하겠습니다.
+          </p>
+          <button type="button" class="ask__btn reveal" data-form="rsvpModal">참석 여부 전달하기</button>
+        </div>
+      </section>
+
       <!-- 6단: 마음 전하기 (계좌 정보는 script의 ACCOUNTS 에서 수정) -->
       <section class="sec" id="sec6">
         <div class="gift">
@@ -1305,6 +1434,18 @@
           </div>
         </div>
       </section>
+      <!-- 방명록 -->
+      <section class="sec" id="secGuestbook">
+        <div class="ask">
+          <h2 class="ask__title reveal">방명록</h2>
+          <p class="ask__text reveal">
+            두 사람에게 따뜻한<br>
+            축하의 한마디를 남겨주세요.
+          </p>
+          <button type="button" class="ask__btn reveal" data-form="gbModal">방명록 작성하기</button>
+        </div>
+      </section>
+
       <!-- 7단: 청첩장 공유하기 -->
       <section class="sec" id="sec7">
         <div class="share">
@@ -1326,6 +1467,82 @@
         </div>
       </section>
     </main>
+  </div>
+
+  <!-- 참석 여부 입력 창 -->
+  <div class="modal" id="rsvpModal" aria-hidden="true">
+    <div class="modal__box modal__box--form" role="dialog" aria-modal="true" aria-labelledby="rsvpTitle">
+      <button type="button" class="modal__close" data-close aria-label="닫기">&times;</button>
+      <p class="modal__title" id="rsvpTitle">참석 여부 전달</p>
+      <form class="f-form" id="rsvpForm" novalidate>
+        <div class="f-row">
+          <span class="f-label">하객측</span>
+          <div class="f-choice">
+            <input type="radio" name="side" id="rsSide1" value="신랑"><label for="rsSide1">신랑</label>
+            <input type="radio" name="side" id="rsSide2" value="신부"><label for="rsSide2">신부</label>
+          </div>
+        </div>
+        <div class="f-row">
+          <span class="f-label">참석 여부</span>
+          <div class="f-choice">
+            <input type="radio" name="attend" id="rsAtt1" value="참석"><label for="rsAtt1">참석</label>
+            <input type="radio" name="attend" id="rsAtt2" value="불참석"><label for="rsAtt2">불참석</label>
+          </div>
+        </div>
+        <!-- 참석을 고른 경우에만 보임 -->
+        <div class="f-row is-off" data-attend-only>
+          <span class="f-label">식사 여부</span>
+          <div class="f-choice">
+            <input type="radio" name="meal" id="rsMeal1" value="O"><label for="rsMeal1">O</label>
+            <input type="radio" name="meal" id="rsMeal2" value="X"><label for="rsMeal2">X</label>
+            <input type="radio" name="meal" id="rsMeal3" value="미정"><label for="rsMeal3">미정</label>
+          </div>
+        </div>
+        <div class="f-row">
+          <label class="f-label" for="rsName">이름</label>
+          <input class="f-input" id="rsName" name="name" type="text" maxlength="20" autocomplete="name" placeholder="성함을 입력해 주세요">
+        </div>
+        <div class="f-row is-off" data-attend-only>
+          <label class="f-label" for="rsComp">동행인 인원 수 <small>본인 제외</small></label>
+          <input class="f-input" id="rsComp" name="companions" type="text" inputmode="numeric" maxlength="2" placeholder="0">
+        </div>
+        <p class="f-error" data-error></p>
+        <button type="submit" class="f-submit">저장하기</button>
+      </form>
+      <div class="f-done">
+        <div class="f-done__icon"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+        <p>저장되었습니다</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 방명록 입력 창 -->
+  <div class="modal" id="gbModal" aria-hidden="true">
+    <div class="modal__box modal__box--form" role="dialog" aria-modal="true" aria-labelledby="gbTitle">
+      <button type="button" class="modal__close" data-close aria-label="닫기">&times;</button>
+      <p class="modal__title" id="gbTitle">방명록 작성</p>
+      <form class="f-form" id="gbForm" novalidate>
+        <div class="f-row">
+          <label class="f-label" for="gbName">이름</label>
+          <input class="f-input" id="gbName" name="name" type="text" maxlength="20" autocomplete="name" placeholder="성함을 입력해 주세요">
+        </div>
+        <div class="f-row">
+          <label class="f-label" for="gbPhone">연락처 뒤 4자리</label>
+          <input class="f-input" id="gbPhone" name="phone4" type="text" inputmode="numeric" maxlength="4" placeholder="예) 1234">
+        </div>
+        <div class="f-row">
+          <label class="f-label" for="gbMsg">축하 메시지 <small>30글자 미만</small></label>
+          <input class="f-input" id="gbMsg" name="message" type="text" maxlength="29" placeholder="결혼 축하해요!">
+          <p class="f-count"><span id="gbMsgCount">0</span> / 29</p>
+        </div>
+        <p class="f-error" data-error></p>
+        <button type="submit" class="f-submit">저장하기</button>
+      </form>
+      <div class="f-done">
+        <div class="f-done__icon"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+        <p>저장되었습니다</p>
+      </div>
+    </div>
   </div>
 
   <!-- 계좌 안내 작은 창 -->
@@ -1901,6 +2118,131 @@
     if (!btn) return;
     copyText(btn.dataset.copy, btn.dataset.msg);
   });
+
+  // ===== 참석 여부 · 방명록 입력 창 =====
+  (function forms() {
+    let openModal = null;
+
+    function showForm(id) {
+      const m = document.getElementById(id);
+      m.classList.remove('is-done');
+      m.querySelector('[data-error]').textContent = '';
+      m.classList.add('is-open');
+      m.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('is-lock');
+      openModal = m;
+      popupOpened(hideForm);          // 뒤로가기를 누르면 창만 닫힘
+    }
+    function hideForm() {
+      if (!openModal) return;
+      openModal.classList.remove('is-open');
+      openModal.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('is-lock');
+      openModal = null;
+    }
+
+    document.querySelectorAll('[data-form]').forEach((btn) => {
+      btn.addEventListener('click', () => showForm(btn.dataset.form));
+    });
+    ['rsvpModal', 'gbModal'].forEach((id) => {
+      const m = document.getElementById(id);
+      m.querySelector('[data-close]').addEventListener('click', () => popupClose());
+      m.addEventListener('click', (e) => { if (e.target === m) popupClose(); });
+    });
+
+    // 다시 입력하기 시작하면 빨간 안내 문구 지우기
+    ['rsvpForm', 'gbForm'].forEach((id) => {
+      const form = document.getElementById(id);
+      const clear = () => { form.querySelector('[data-error]').textContent = ''; };
+      form.addEventListener('input', clear);
+      form.addEventListener('change', clear);
+    });
+
+    // 숫자만 입력되도록
+    ['rsComp', 'gbPhone'].forEach((id) => {
+      const el = document.getElementById(id);
+      el.addEventListener('input', () => { el.value = el.value.replace(/[^0-9]/g, ''); });
+    });
+
+    // 참석을 고르면 식사 여부·동행인 칸 보이기
+    const rsvpForm = document.getElementById('rsvpForm');
+    rsvpForm.addEventListener('change', (e) => {
+      if (e.target.name !== 'attend') return;
+      const yes = e.target.value === '참석';
+      rsvpForm.querySelectorAll('[data-attend-only]').forEach((row) => row.classList.toggle('is-off', !yes));
+    });
+
+    // 메시지 글자 수 표시
+    const gbMsg = document.getElementById('gbMsg');
+    gbMsg.addEventListener('input', () => {
+      document.getElementById('gbMsgCount').textContent = [...gbMsg.value].length;
+    });
+
+    async function send(form, url, data) {
+      const modal = form.closest('.modal');
+      const err = modal.querySelector('[data-error]');
+      const btn = form.querySelector('.f-submit');
+      err.textContent = '';
+      btn.disabled = true;
+      btn.textContent = '저장 중...';
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        const out = await res.json().catch(() => ({ ok: false }));
+        if (!out.ok) throw new Error(out.error || '저장하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+        // 저장 완료 → "저장되었습니다" 잠깐 보여준 뒤 청첩장으로 돌아감
+        modal.classList.add('is-done');
+        form.reset();
+        form.querySelectorAll('[data-attend-only]').forEach((row) => row.classList.add('is-off'));
+        document.getElementById('gbMsgCount').textContent = '0';
+        setTimeout(() => { if (openModal === modal) popupClose(); }, 1600);
+      } catch (e) {
+        err.textContent = e.message && e.message !== 'Failed to fetch'
+          ? e.message : '인터넷 연결을 확인한 뒤 다시 시도해 주세요.';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '저장하기';
+      }
+    }
+
+    // 참석 여부 저장
+    rsvpForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const f = rsvpForm.elements;
+      const err = rsvpForm.querySelector('[data-error]');
+      const attend = f.attend.value;
+      if (!f.side.value) return (err.textContent = '하객측(신랑/신부)을 선택해 주세요.');
+      if (!attend) return (err.textContent = '참석 여부를 선택해 주세요.');
+      if (attend === '참석' && !f.meal.value) return (err.textContent = '식사 여부를 선택해 주세요.');
+      if (!f.name.value.trim()) return (err.textContent = '이름을 입력해 주세요.');
+      send(rsvpForm, '/api/rsvp', {
+        side: f.side.value,
+        attend,
+        meal: attend === '참석' ? f.meal.value : '',
+        name: f.name.value.trim(),
+        companions: attend === '참석' ? (f.companions.value || '0') : '0',
+      });
+    });
+
+    // 방명록 저장
+    const gbForm = document.getElementById('gbForm');
+    gbForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const f = gbForm.elements;
+      const err = gbForm.querySelector('[data-error]');
+      if (!f.name.value.trim()) return (err.textContent = '이름을 입력해 주세요.');
+      if (!/^\d{4}$/.test(f.phone4.value)) return (err.textContent = '연락처 뒤 4자리를 숫자로 입력해 주세요.');
+      if (!f.message.value.trim()) return (err.textContent = '축하 메시지를 입력해 주세요.');
+      send(gbForm, '/api/guestbook', {
+        name: f.name.value.trim(),
+        phone4: f.phone4.value,
+        message: f.message.value.trim(),
+      });
+    });
+  })();
 
   // ===== 6단: 마음 전하기 =====
   // 계좌는 여러 개 넣을 수 있습니다 (예: 혼주 계좌 추가 시 list 에 한 줄 더)
