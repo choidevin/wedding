@@ -1,0 +1,12 @@
+   worker.js
+   wrangler.jsonc
+   wrangler.toml
+   .assetsignore
+   .git
+   .github
+   node_modules
+   package.json
+   package-lock.json
+   README.md
+   .dev.vars
+   .wrangler
