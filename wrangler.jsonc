@@ -1,0 +1,17 @@
+{
+  // 청첩장 서버 설정 파일
+  "name": "wedding",
+  "main": "worker.js",
+  "compatibility_date": "2025-09-01",
+  "assets": {
+    "directory": ".",
+    "binding": "ASSETS"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "wedding-db",
+      "database_id": "dc07112e-e6a2-425c-b91b-a464f229086b"
+    }
+  ]
+}
